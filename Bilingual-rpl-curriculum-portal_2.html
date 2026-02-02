@@ -1,0 +1,3595 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Integrated Curriculum & RPL System - STT Pekanbaru</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <style>
+        /* --- CSS DASHBOARD --- */
+        :root {
+            --primary-color: #D32F2F; 
+            --accent-color: #FFD700;
+            --gradient-dark: #8B0000; 
+            --light-bg: #f8f9fa;
+            --text-color: #333333;
+            --white: #ffffff;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            min-height: 100vh;
+            background-color: var(--light-bg);
+            color: var(--text-color);
+        }
+
+        /* SIDEBAR NAVIGATION */
+        .sidebar {
+            width: 300px;
+            background: linear-gradient(180deg, var(--primary-color) 0%, var(--gradient-dark) 100%);
+            color: var(--white);
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            height: 100%;
+            overflow-y: auto;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.5);
+            z-index: 1000;
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            text-align: center;
+            background: rgba(0,0,0,0.1); 
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+        }
+        .sidebar-logo { max-width: 80px; height: auto; margin-left: 80px; margin-bottom: 10px; filter: drop-shadow(0 0 8px var(--accent-color)); }
+        .sidebar-header h2, .sidebar-header h3 { font-size: 18px; margin-bottom: 5px; color: #ffe08a; font-weight: bold; text-shadow: 1px 1px 2px rgba(0,0,0,0.5); }
+        .sidebar-header p { font-size: 12px; font-style: italic; opacity: 0.9; margin-bottom: 0;}
+        .owner-name { margin-top: 14px; font-size: 6px; color: var(--accent-color); font-weight: bold; text-transform: sentence case; letter-spacing: 1px; }
+        .lang-select {
+            width: 100%;
+            margin-top: 8px;
+            padding: 6px 8px;
+            border-radius: 6px;
+            border: 1px solid rgba(255,255,255,0.35);
+            background: rgba(0,0,0,0.2);
+            color: #fff;
+            font-size: 12px;
+        }
+        
+        .nav-links { list-style: none; padding: 20px 0; }
+        .nav-links li a {
+            display: block;
+            padding: 15px 25px;
+            color: rgba(255,255,255,0.9);
+            text-decoration: none;
+            border-left: 4px solid transparent;
+            transition: 0.3s;
+            font-size: 14px;
+        }
+        .nav-links li a:hover { background-color: rgba(255,255,255,0.2); color: var(--white); }
+        .nav-links li a.active { background-color: rgba(0,0,0,0.2); border-left: 4px solid var(--accent-color); color: var(--white); font-weight: bold; }
+
+        /* MAIN CONTENT AREA */
+        .main-content {
+            margin-left: 300px;
+            flex: 1;
+            padding: 40px;
+            overflow-y: auto;
+        }
+
+        /* CONTENT SECTIONS */
+        .section { display: none; animation: fadeIn 0.5s; }
+        .section.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        h1.page-title { color: var(--primary-color); border-bottom: 3px solid var(--primary-color); padding-bottom: 10px; margin-bottom: 30px; font-weight: bold; text-transform: uppercase; font-size: 2rem; }
+        h3 { color: var(--primary-color); margin-top: 20px; margin-bottom: 10px; border-left: 4px solid var(--accent-color); padding-left: 10px; font-size: 1.25rem; font-weight: bold;}
+        p { line-height: 1.6; margin-bottom: 15px; }
+        ul { margin-left: 20px; margin-bottom: 15px; }
+
+        /* COVER */
+        .cover-page {
+            max-width: 700px;
+            margin: 40px auto;
+            border: 5px solid var(--gradient-dark); 
+            padding: 60px 40px;
+            text-align: center;
+            background: white;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            position: relative;
+        }
+        .cover-logo { max-width: 120px; height: auto; margin-bottom: 20px; display: inline-block; }
+        .cover-title { font-size: 24px; font-weight: bold; text-transform: uppercase; margin-bottom: 10px; color: var(--primary-color); }
+        .cover-subtitle { font-size: 18px; font-weight: bold; margin-bottom: 40px; color: #333; }
+        .cover-doc-title { 
+            font-size: 20px; font-weight: bold; text-transform: uppercase; margin: 60px 0; border: 2px double #000; padding: 20px; background-color: #f9f9f9;
+        }
+        .cover-footer { position: absolute; bottom: 30px; left: 0; right: 0; width: 100%; font-style: italic; }
+
+        /* DAFTAR MK */
+        .search-container { margin-bottom: 20px; background: white; padding: 15px; border-radius: 8px; border: 1px solid #ddd; }
+        .search-input { 
+            width: 100%; padding: 10px; border-radius: 4px; border: 1px solid var(--primary-color); 
+            font-size: 14px; font-weight: bold; color: var(--primary-color);
+        }
+        .semester-group { margin-bottom: 20px; border: 1px solid #e6e6e6; border-radius: 8px; overflow: hidden; background: #fff; }
+        .semester-header { background-color: var(--gradient-dark); color: white; padding: 10px 15px; border-bottom: 1px solid #ddd; font-weight: bold; }
+        .semester-summary { text-align: right; font-size: 12px; color: #666; padding: 6px 12px; background: #fafafa; }
+        .total-skss-card { background: var(--accent-color); color: black; padding: 10px 15px; border-radius: 4px; display: inline-block; font-size: 16px; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin-top: 20px;}
+        .semester-table { width: 100%; border-collapse: separate; border-spacing: 20px; }
+        .semester-table td { vertical-align: top; }
+        .semester-cell { min-height: 220px; }
+        .course-list { list-style: none; padding: 12px 12px 0; margin: 0; }
+        .course-item { border: 1px solid #eee; border-radius: 6px; padding: 10px 12px; margin-bottom: 10px; background: #fafafa; }
+        .course-item h4 { margin: 0 0 4px; font-weight: bold; color: var(--primary-color); font-size: 0.95rem; }
+        .course-item .meta { font-size: 12px; color: #555; margin-bottom: 6px; }
+        .course-item .meta span { margin-right: 10px; }
+        .course-item button { margin-top: 6px; }
+        @media (max-width: 900px) {
+            .semester-grid, .semester-row { grid-template-columns: 1fr; }
+            .semester-cell { min-height: unset; }
+        }
+        
+        /* GENERATOR & ASSESSMENT & TRANSFER */
+        .box { background: white; padding: 25px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); border-top: 4px solid var(--primary-color); margin-bottom: 20px; }
+        .toolbar { display: flex; flex-wrap: wrap; gap: 10px; padding: 15px; background: #333; border-radius: 5px; margin-bottom: 20px; align-items: center; }
+        .revision-panel { background:#f9f9f9; border:1px dashed #ccc; padding:12px; border-radius:6px; margin-bottom:20px; }
+        .revision-panel textarea { width:100%; min-height:90px; }
+        
+        select, input[type="text"], textarea {
+            padding: 8px; border-radius: 4px; border: 1px solid #ccc; font-family: inherit;
+        }
+        select { background: #222; color: white; border: 1px solid #555; min-width: 200px; }
+        
+        .btn {
+            padding: 8px 15px;
+            cursor: pointer;
+            border: none;
+            border-radius: 4px;
+            font-size: 13px;
+            font-weight: bold;
+            transition: 0.3s;
+            color: white;
+            text-transform: uppercase;
+        }
+        .btn-primary { background-color: var(--primary-color); } 
+        .btn-success { background-color: #28a745; }
+        .btn-warning { background-color: var(--accent-color); color: #000; } 
+        .btn-danger { background-color: #dc3545; }
+        .btn-info { background-color: #17a2b8; }
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.2); }
+
+        .edit-only { display: none; }
+        body.edit-active .edit-only { display: inline-flex; }
+
+        /* TABLES */
+        table { width: 100%; border-collapse: collapse; margin: 20px 0; background: white; font-size: 14px; }
+        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; vertical-align: top; }
+        th { background-color: var(--primary-color); color: white; text-transform: uppercase; font-size: 12px; }
+        tr:nth-child(even) { background-color: #f2f2f2; }
+        tr:hover { background-color: #ffebee; }
+
+        .rps-table { table-layout: fixed; }
+        .rps-table th, .rps-table td { word-break: break-word; }
+        .rps-table input, .rps-table textarea, .rps-table select { max-width: 100%; }
+
+        /* ASSESSMENT SPECIFIC */
+        .sub-tabs { display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 2px solid #ddd; }
+        .sub-tab { padding: 10px 20px; cursor: pointer; font-weight: bold; border-radius: 5px 5px 0 0; background: #e9ecef; color: #666; transition: 0.3s; }
+        .sub-tab:hover { background: #ddd; }
+        .sub-tab.active { background: var(--primary-color); color: white; border-radius: 5px 5px 0 0; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; animation: fadeIn 0.3s; }
+
+        .assessment-select {
+            width: 100%; padding: 4px; border-radius: 4px; border: 1px solid #666; background: white; font-size: 12px; font-weight: bold; color: #333;
+        }
+        .status-text { font-weight: bold; padding: 4px; border-radius: 3px; display: inline-block; min-width: 120px; text-align: center;}
+        .status-transfer { background-color: #17a2b8; color: white; border: 1px solid #117a8b; }
+        .status-perolehan { background-color: #28a745; color: white; border: 1px solid #1e7e34; }
+        .status-failed { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .status-none { background-color: white; color: #999; border: 1px solid #eee; }
+
+        /* SUMMARY */
+        .summary-cards { display: flex; gap: 20px; margin-bottom: 20px; }
+        .card { flex: 1; padding: 20px; background: white; box-shadow: 0 2px 5px rgba(0,0,0,0.1); text-align: center; border-left: 5px solid var(--accent-color); }
+        .card h3 { margin: 0; color: #555; font-size: 14px; }
+        .card p { margin: 0; font-size: 24px; font-weight: bold; color: var(--primary-color); }
+
+        /* CONCLUSION TABLE (FINAL REPORT) */
+        .final-report-table { width: 95%; max-width: 1100px; margin: 20px auto; border-collapse: collapse; table-layout: fixed; }
+        .final-report-table th, .final-report-table td { padding: 6px; text-align: left; border: 1px solid black; color: black; vertical-align: middle; }
+        .final-report-table th { background-color: #ddd !important; color: black; }
+
+        /* TRANSFER LAYOUT */
+        .transfer-container { display: flex; gap: 20px; flex-wrap: wrap; }
+        .transfer-col { flex: 1; min-width: 300px; }
+        .transfer-col h4 { color: var(--gradient-dark); border-bottom: 2px solid var(--accent-color); margin-bottom: 10px; margin-top: 0px; font-weight: bold; font-size: 1.1em;}
+        .transfer-item { display: flex; justify-content: space-between; align-items: center; padding: 10px; background: #f9f9f9; margin-bottom: 5px; border-radius: 4px; border-left: 3px solid var(--primary-color); }
+        .transfer-item:hover { background: #e9ecef; }
+        
+        .transfer-item select {
+            background: white;
+            color: #333;
+            max-width: 200px;
+        }
+
+        /* PRINT MEDIA QUERY */
+        @media print {
+            .sidebar, .toolbar, .btn, .sub-tabs, .nav-links, .search-container, .semester-group { display: none !important; }
+            .page-title, .section > p, .student-input-panel, .summary-cards, #status-msg { display: none !important; }
+            .screen-only { display: none !important; }
+            .print-only { display: block !important; }
+            
+            .main-content { margin-left: 0 !important; padding: 0 !important; width: 100%; }
+            .box { box-shadow: none !important; border: none !important; padding: 0 !important; margin: 0 !important; }
+            body { background: white; margin: 0; }
+            @page { size: A4 potrait; margin: 8mm 6mm 6mm 6mm; }
+            
+            .a4-page {
+                width: 297mm; min-height: 210mm; padding: 6mm; margin: 0; border: none; font-family: "Times New Roman", Times, serif; font-size: 10.5pt; color: black; line-height: 1.25; position: relative; page-break-after: always; break-after: page; }
+            
+            input.editable-input { border: none; background: transparent; }
+            select.assessment-select { border: none; background: transparent; appearance: none; -webkit-appearance: none; }
+            
+            .print-header { text-align: center; margin-top: calc(4mm - 15px); margin-bottom: 10px; }
+            h1.page-title { color: black; border-bottom: 1px solid black; }
+            h3 { color: black; border-left: none; padding-left: 0; font-weight: bold; }
+            table { background: white !important; }
+            th { background: linear-gradient(180deg, #f2f2f2, #e6e6e6) !important; color: black !important; }
+            table thead tr { background: linear-gradient(180deg, #f2f2f2, #e6e6e6) !important; }
+            .final-report-table th { background: linear-gradient(180deg, #f2f2f2, #e6e6e6) !important; color: black !important; }
+            tr:nth-child(even) { background: white !important; }
+
+            .final-report-table { width: 100% !important; font-size: 9px; line-height: 1.1; }
+            .final-report-table th, .final-report-table td { padding: 4px 4px; }
+            .final-report-table th:nth-child(3),
+            .final-report-table td:nth-child(3) { text-align: center; }
+            .page-break-before { page-break-before: always; break-before: page; }
+            body { counter-reset: page; }
+            .print-page-number {
+                position: fixed;
+                bottom: 4mm;
+                right: 6mm;
+                font-size: 9px;
+            }
+            .print-page-number::after { content: "Halaman " counter(page) " / " counter(pages); }
+        }
+
+        .print-area { padding: 20px; }
+        .print-only { display: none; }
+        .screen-only { display: block; }
+        .print-limit-3pages { max-height: none; overflow: visible; }
+        @media print {
+            .print-limit-3pages { max-height: 880mm; overflow: hidden; }
+        }
+
+        /* --- Modern UI tweaks (visual only, no logic change) --- */
+        body {
+            background: radial-gradient(circle at 10% 20%, #fdf2f2 0%, #f8fafc 35%, #eef2ff 70%);
+        }
+        .main-content {
+            background: linear-gradient(135deg, rgba(255,255,255,0.85), rgba(255,255,255,0.95));
+        }
+        .box {
+            background: rgba(255,255,255,0.96);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(0,0,0,0.06);
+            box-shadow: 0 12px 40px rgba(0,0,0,0.08), 0 4px 12px rgba(0,0,0,0.04);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            border-radius: 12px;
+        }
+        .box:hover { transform: translateY(-3px); box-shadow: 0 20px 50px rgba(0,0,0,0.12), 0 8px 20px rgba(0,0,0,0.06); }
+        .toolbar {
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+            border-radius: 8px;
+        }
+        .btn {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            letter-spacing: 0.4px;
+            transition: all 0.2s ease;
+            border-radius: 6px;
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+            filter: brightness(1.05);
+        }
+        .btn:active { transform: translateY(0); box-shadow: 0 2px 8px rgba(0,0,0,0.25); }
+        .btn-primary { background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); }
+        .btn-success { background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%); }
+        .btn-info { background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%); }
+        .btn-warning { background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%); }
+        .btn-danger { background: linear-gradient(135deg, #f87171 0%, #dc2626 100%); }
+        .course-item {
+            transition: all 0.2s ease;
+            border-radius: 10px;
+            border: 1px solid rgba(0,0,0,0.06);
+            background: linear-gradient(135deg, #ffffff 0%, #fafafa 100%);
+        }
+        .course-item:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 16px 40px rgba(0,0,0,0.12);
+            border-color: var(--primary-color);
+        }
+        .semester-group {
+            box-shadow: 0 8px 32px rgba(0,0,0,0.08);
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+        .semester-header {
+            background: linear-gradient(135deg, var(--gradient-dark) 0%, #6b0f0f 100%);
+            padding: 14px 18px;
+            font-size: 1rem;
+        }
+        .sidebar {
+            box-shadow: 8px 0 40px rgba(0,0,0,0.25);
+            background: linear-gradient(180deg, #c62828 0%, #8b0000 50%, #5d0000 100%);
+        }
+        .sidebar-header {
+            background: rgba(0,0,0,0.15);
+            backdrop-filter: blur(8px);
+        }
+        .nav-links li a {
+            transition: all 0.2s ease;
+            border-radius: 0 8px 8px 0;
+            margin-right: 12px;
+        }
+        .nav-links li a:hover {
+            background: linear-gradient(90deg, rgba(255,255,255,0.15), rgba(255,255,255,0.05));
+            padding-left: 30px;
+        }
+        .nav-links li a.active {
+            background: linear-gradient(90deg, rgba(0,0,0,0.3), rgba(0,0,0,0.1));
+            border-left: 4px solid var(--accent-color);
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.1);
+        }
+        .sub-tab {
+            transition: all 0.2s ease;
+            border-radius: 8px 8px 0 0;
+        }
+        .sub-tab:hover {
+            background: linear-gradient(180deg, #e5e7eb, #d1d5db);
+            transform: translateY(-2px);
+        }
+        .sub-tab.active { 
+            background: linear-gradient(180deg, var(--primary-color), #b71c1c);
+            box-shadow: 0 -4px 20px rgba(211, 47, 47, 0.3);
+        }
+        .search-input {
+            border-radius: 8px;
+            transition: all 0.2s ease;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.06);
+        }
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(211, 47, 47, 0.15), inset 0 2px 4px rgba(0,0,0,0.06);
+        }
+        .search-container {
+            border-radius: 10px;
+            background: linear-gradient(135deg, #ffffff, #f8f9fa);
+        }
+        .card {
+            border-radius: 10px;
+            transition: all 0.2s ease;
+            border-left: 5px solid var(--accent-color);
+            background: linear-gradient(135deg, #ffffff, #fffdf7);
+        }
+        .card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 30px rgba(0,0,0,0.1);
+        }
+        .summary-cards {
+            gap: 16px;
+        }
+        table {
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+        }
+        th {
+            background: linear-gradient(135deg, var(--primary-color), #b71c1c) !important;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        tr:hover {
+            background-color: #fff5f5 !important;
+        }
+        .cover-page {
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.12);
+            border: 5px solid var(--gradient-dark);
+        }
+        .total-skss-card {
+            border-radius: 8px;
+            background: linear-gradient(135deg, var(--accent-color), #e6c200);
+            box-shadow: 0 6px 20px rgba(255, 215, 0, 0.3);
+            font-weight: 700;
+        }
+        .assessment-select {
+            border-radius: 6px;
+            transition: all 0.2s ease;
+        }
+        .assessment-select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(211, 47, 47, 0.2);
+        }
+        input[type="text"], textarea, select {
+            border-radius: 6px;
+            transition: all 0.2s ease;
+        }
+        input[type="text"]:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(211, 47, 47, 0.1);
+        }
+        .revision-panel {
+            border-radius: 10px;
+            background: linear-gradient(135deg, #f9fafb, #f3f4f6);
+        }
+        .student-input-panel {
+            border-radius: 10px;
+            background: linear-gradient(135deg, #f9fafb, #f3f4f6) !important;
+            border: 1px solid rgba(0,0,0,0.08) !important;
+        }
+        h1.page-title {
+            background: linear-gradient(90deg, var(--primary-color), #b71c1c);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-fill-color: transparent;
+            border-bottom: 3px solid;
+            border-image: linear-gradient(90deg, var(--primary-color), var(--accent-color)) 1;
+        }
+        /* Smooth scrollbar */
+        ::-webkit-scrollbar {
+            width: 10px;
+            height: 10px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 5px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, #c62828, #8b0000);
+            border-radius: 5px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(180deg, #ef5350, #c62828);
+        }
+        /* Loading animation for page */
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .section.active {
+            animation: slideIn 0.4s ease-out;
+        }
+        /* Glowing effect for active elements */
+        .nav-links li a[style*="background-color: var(--accent-color)"] {
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.4);
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 0 20px rgba(255, 215, 0, 0.4); }
+            50% { box-shadow: 0 0 30px rgba(255, 215, 0, 0.6); }
+        }
+
+        /* Language modal */
+        .language-modal {
+            position: fixed;
+            inset: 0;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(4px);
+            z-index: 2000;
+        }
+        .language-modal.active { display: flex; }
+        .language-card {
+            width: min(520px, 90vw);
+            background: #fff;
+            border-radius: 16px;
+            padding: 28px;
+            box-shadow: 0 24px 60px rgba(0,0,0,0.2);
+            text-align: center;
+        }
+        .language-card h2 { color: var(--primary-color); margin-bottom: 8px; }
+        .language-card p { font-size: 14px; color: #555; margin-bottom: 18px; }
+        .language-actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+
+        body.language-pending .sidebar,
+        body.language-pending .main-content {
+            filter: blur(2px);
+            pointer-events: none;
+            user-select: none;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- LANGUAGE MODAL -->
+    <div id="language-modal" class="language-modal">
+        <div class="language-card">
+            <h2>Choose Language / Pilih Bahasa</h2>
+            <p>Select Bahasa Indonesia or English to start. Default language is English.</p>
+            <div class="language-actions">
+                <button class="btn btn-success" onclick="setLanguage('id', true)">🇮🇩 Bahasa Indonesia</button>
+                <button class="btn btn-primary" onclick="setLanguage('en', true)">🇬🇧 English</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- SIDEBAR NAVIGATION -->
+    <nav class="sidebar">
+        <div class="sidebar-header">
+            <img src="logo_STTP.png" alt="Logo STT Pekanbaru" class="sidebar-logo">
+            <h3 data-i18n="sidebarTitle">Sekolah Tinggi Teknologi Pekanbaru</h3>
+            <p data-i18n="sidebarProgram">Teknik Mesin</p>
+            <select id="langSelect" class="lang-select" onchange="setLanguage(this.value)">
+                <option value="id">Bahasa Indonesia</option>
+                <option value="en">English</option>
+            </select>
+            <p class="owner-name">by: Sepfitrah</p>
+        </div>
+        <ul class="nav-links">
+            <li><a href="#" onclick="showSection('cover')" id="nav-cover" data-i18n="navCover">🏠 Document Cover</a></li>
+            <li><a href="#" onclick="showSection('visi-misi')" id="nav-visi-misi" data-i18n="navVision">🎯 Vision, Mission & Goals</a></li>
+            <li><a href="#" onclick="showSection('profil')" id="nav-profil" data-i18n="navProfile">👤 Graduate Profile</a></li>
+            <li><a href="#" onclick="showSection('cpl')" id="nav-cpl" data-i18n="navCpl">🎓 Learning Outcomes</a></li>
+            <li><a href="#" onclick="showSection('daftar-mk')" id="nav-daftar-mk" data-i18n="navCourses">📚 Course List</a></li>
+            <li><a href="#" onclick="showSection('generator')" id="nav-generator" data-i18n="navRps">⚙️ RPS Generator</a></li>
+            <!-- MENU RPL (MERGED) -->
+            <li><a href="#" onclick="showSection('assessment')" id="nav-assessment" style="background-color: var(--accent-color); color: black; font-weight: bold;" data-i18n="navRpl">📝 RPL Assessment</a></li>
+        </ul>
+        <div style="margin-top: auto; padding: 20px; font-size: 12px; text-align: center; opacity: 0.8;">
+            &copy; 2026 STT Pekanbaru
+        </div>
+    </nav>
+
+    <!-- MAIN CONTENT AREA -->
+    <main class="main-content">
+
+        <!-- SECTION 1: COVER PAGE -->
+        <div id="cover" class="section active">
+            <div class="cover-page">
+                <img src="logo_STTP.png" alt="STT Pekanbaru Logo" class="cover-logo">
+                <div class="cover-title" data-i18n="coverTitle">IABEEE-Compliant Curriculum 2026</div>
+		<p><strong data-i18n="coverYear"></strong></p>
+                <div class="cover-subtitle" data-i18n="coverSubtitle">UNDERGRADUATE PROGRAM IN MECHANICAL ENGINEERING<br>SEKOLAH TINGGI TEKNOLOGI PEKANBARU</div>
+                <div class="cover-doc-title" data-i18n="coverDocTitle">
+                    CURRICULUM<br>
+                    AND<br>
+                    COURSE SYLLABI
+                </div>
+                
+                <div class="cover-footer" data-i18n="coverFooter">
+                    Jl. Dirgantara No.4 Marpoyan Damai, Pekanbaru 28125 – Riau<br>
+                    Telp: 0761-61815
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION 2: VISION & MISSION -->
+        <div id="visi-misi" class="section">
+            <h1 class="page-title" data-i18n="visionTitle">Vision, Mission, and Goals</h1>
+            <h3 data-i18n="visionLabel">Vision</h3>
+            <p data-i18n="visionText">To become a leading mechanical engineering program that produces graduates who are adaptive to the workforce needs of business, industry, and entrepreneurship in Riau Province and the Sijori region by 2025.</p>
+            <h3 data-i18n="missionLabel">Mission</h3>
+            <ul>
+                <li data-i18n="mission1">Deliver mechanical engineering education that produces outstanding graduates who are adaptive to business, industry, and entrepreneurship needs with integrity based on science, technology, and faith.</li>
+                <li data-i18n="mission2">Conduct research to advance knowledge in engineering and solve problems in mechanical engineering.</li>
+                <li data-i18n="mission3">Provide community service as a form of applying engineering science and technology for public welfare.</li>
+                <li data-i18n="mission4">Provide adequate facilities and infrastructure to support a conducive learning process.</li>
+                <li data-i18n="mission5">Build cooperation with relevant institutions in and outside the country, especially in mechanical engineering.</li>
+            </ul>
+        </div>
+
+        <!-- SECTION 3: GRADUATE PROFILE -->
+        <div id="profil" class="section">
+            <h1 class="page-title" data-i18n="profileTitle">Graduate Profile</h1>
+            <p data-i18n="profileIntro">Based on key factors influencing graduate profiles, the Mechanical Engineering Program at STT Pekanbaru defines the following graduate profiles:</p>
+            <table>
+                <tr><th data-i18n="profileCol1">Profile</th><th data-i18n="profileCol2">Brief Description</th></tr>
+                <tr><td><strong data-i18n="profileEngineer">Engineer</strong></td><td data-i18n="profileEngineerDesc">Capable of meeting market needs for engineering roles.</td></tr>
+                <tr><td><strong data-i18n="profileConsultant">Consultant</strong></td><td data-i18n="profileConsultantDesc">Capable of meeting market needs for consulting services.</td></tr>
+                <tr><td><strong data-i18n="profileEnergy">Energy Manager</strong></td><td data-i18n="profileEnergyDesc">Capable of managing energy and materials.</td></tr>
+                <tr><td><strong data-i18n="profileResearch">Research Assistant</strong></td><td data-i18n="profileResearchDesc">Capable of meeting challenges in scientific development.</td></tr>
+                <tr><td><strong data-i18n="profileEntrepreneur">Entrepreneur</strong></td><td data-i18n="profileEntrepreneurDesc">Capable of creating new job opportunities.</td></tr>
+            </table>
+        </div>
+
+        <!-- SECTION 4: CPL -->
+        <div id="cpl" class="section">
+            <h1 class="page-title" data-i18n="cplTitle">Graduate Learning Outcomes (CPL)</h1>
+            <p data-i18n="cplIntro">The learning outcomes refer to graduate qualifications covering Attitude, General Knowledge, General Skills, and Special Skills.</p>
+            <table>
+                <tr><th data-i18n="cplColCode">Code</th><th data-i18n="cplColAspect">Aspect</th><th data-i18n="cplColDesc">Graduate Learning Outcomes (CPL)</th></tr>
+                <tr><td><strong>CPL-S1</strong></td><td><strong data-i18n="cplAttitude">Attitude</strong></td><td data-i18n="cplS1">Devout in worship, faithful, and demonstrating moral integrity, professional responsibility, and national spirit in engineering practice.</td></tr>
+                <tr><td><strong>CPL-P1</strong></td><td><strong data-i18n="cplKnowledge">General Knowledge</strong></td><td data-i18n="cplP1">Apply mathematics, basic sciences, and engineering principles to solve complex mechanical engineering problems.</td></tr>
+                <tr><td><strong>CPL-PU1</strong></td><td><strong data-i18n="cplGeneralSkills">General Skills</strong></td><td data-i18n="cplPU1">Communicate effectively, think critically, and collaborate across disciplines while upholding honesty and trustworthiness.</td></tr>
+                <tr><td><strong>CPL-PK1</strong></td><td><strong data-i18n="cplSpecialSkills">Special Skills</strong></td><td data-i18n="cplPK1">Design AI-based mechanical systems for sustainable applications in oil & gas, palm oil, and pulp & paper industries.</td></tr>
+                <tr><td><strong>CPL-PK2</strong></td><td><strong data-i18n="cplSpecialSkills">Special Skills</strong></td><td data-i18n="cplPK2">Use modern technologies (CAD/CAM/CAE, Python/AI) safely in engineering practice (K3).</td></tr>
+            </table>
+        </div>
+
+        <!-- SECTION 5: COURSE LIST -->
+        <div id="daftar-mk" class="section">
+            <h1 class="page-title" data-i18n="courseListTitle">Course List</h1>
+            <p data-i18n="courseListIntro">Below is the complete course list for the Mechanical Engineering Program at STT Pekanbaru.</p>
+            
+            <div class="box">
+                <div class="search-container">
+                    <input type="text" id="searchMK" class="search-input" placeholder="🔍 Search by Course Name or Code..." onkeyup="filterCourses()" data-i18n-placeholder="courseListSearch">
+                </div>
+
+                <div id="course-list-container">
+                    <!-- Generated by JavaScript -->
+                </div>
+
+                <div class="total-skss-card" data-i18n="courseListTotal">
+                    Total Credit Load: <span id="grand-total-sks">0</span> Credits
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION 6: RPS GENERATOR -->
+        <div id="generator" class="section">
+            <h1 class="page-title" data-i18n="rpsTitle">Semester Learning Plan (RPS) Generator</h1>
+            <p data-i18n="rpsIntro">This page helps lecturers prepare and print complete RPS documents.</p>
+            
+            <div class="box">
+                <div class="toolbar">
+                    <strong data-i18n="rpsTools">Tools:</strong>
+                    <select id="selectRPS" onchange="loadCourseFromSelect(this.value)">
+                        <option value="" data-i18n="rpsSelectOption">-- Select RPS --</option>
+                    </select>
+                    <button class="btn btn-primary" onclick="toggleEditMode()" data-i18n="rpsEditMode">✏️ Edit Mode</button>
+                    <div style="flex-grow:1;"></div>
+                    <button class="btn btn-primary" onclick="window.print()" data-i18n="rpsPrint">🖨️ Print RPS</button>
+                    <button class="btn btn-danger" onclick="clearEditor()" data-i18n="rpsClear">🗑️ Clear</button>
+                </div>
+
+                <div id="status-msg" style="margin-bottom: 20px; font-style: italic; color: #666;"></div>
+
+                <div class="revision-panel edit-only" style="margin-top:0; margin-bottom:16px;">
+                    <div style="font-weight:bold; margin-bottom:6px;" data-i18n="rpsImportTitle">Import Weekly Plan (JSON / CSV)</div>
+                    <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+                        <label class="btn btn-warning" style="display:inline-flex; align-items:center; gap:6px;" data-i18n="rpsImportJson">
+                            🧩 Import JSON
+                            <input type="file" id="importRpsJson" accept=".json,.jason" style="display:none;" onchange="importRpsJSON(this.files[0])">
+                        </label>
+                        <label class="btn btn-info" style="display:inline-flex; align-items:center; gap:6px;" data-i18n="rpsImportCsv">
+                            📄 Import CSV
+                            <input type="file" id="importRpsCsv" accept=".csv" style="display:none;" onchange="importRpsCSV(this.files[0])">
+                        </label>
+                        <button class="btn btn-success" onclick="saveToDatabase()" data-i18n="rpsSave">💾 Save RPS</button>
+                        <button class="btn btn-warning" onclick="addScheduleRow()" data-i18n="rpsAddRow">➕ Add Row</button>
+                        <div style="font-size:12px; color:#666;" data-i18n="rpsImportHint">Import is available only in Edit Mode.</div>
+                    </div>
+                </div>
+
+                <div id="rps-preview-area"></div>
+
+                <div class="revision-panel" style="margin-top:20px;">
+                    <div style="font-weight:bold; margin-bottom:6px;" data-i18n="rpsRevisionTitle">Revision Notes / Changes</div>
+                    <textarea id="rpsRevisionNotes" placeholder="Write the summary of revisions or changes here..." data-i18n-placeholder="rpsRevisionPlaceholder"></textarea>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- SECTION 7: RPL ASSESSMENT (MAIN HUB) -->
+        <div id="assessment" class="section">
+            <h1 class="page-title" data-i18n="rplTitle">RPL Assessment (Recognition of Prior Learning)</h1>
+            <p data-i18n="rplIntro">Main hub for assessment, credit transfer, and final reporting.</p>
+            
+            <div class="box">
+                <div class="student-input-panel" style="background:#f9f9f9; border:1px solid #eee; padding:15px; border-radius:6px; margin-bottom:15px;">
+                    <div style="font-weight:bold; margin-bottom:8px;" data-i18n="rplStudentInputTitle">New Student Input</div>
+                    <div style="display:flex; flex-wrap:wrap; gap:10px; align-items:center;">
+                        <input type="text" id="inputNewStudentName" placeholder="Student Name" style="flex:1; min-width:200px;" data-i18n-placeholder="rplStudentName">
+                        <input type="text" id="inputNewStudentBirth" placeholder="Place/Date of Birth" style="flex:1; min-width:200px;" data-i18n-placeholder="rplStudentBirth">
+                        <input type="text" id="inputNewStudentNim" placeholder="Student ID" style="flex:1; min-width:160px;" data-i18n-placeholder="rplStudentId">
+                        <input type="text" id="inputNewStudentCampus" placeholder="Prior Education Level" style="flex:1; min-width:200px;" data-i18n-placeholder="rplStudentEducation">
+                        <input type="text" id="inputNewStudentOriginNim" placeholder="Origin Student ID" style="flex:1; min-width:160px;" data-i18n-placeholder="rplStudentOriginId">
+                        <input type="text" id="inputNewStudentGradYear" placeholder="Graduation Year" style="flex:1; min-width:160px;" data-i18n-placeholder="rplStudentGradYear">
+                        <input type="text" id="inputNewStudentJob" placeholder="Current Job" style="flex:1; min-width:200px;" data-i18n-placeholder="rplStudentJob">
+                        <input type="text" id="inputNewStudentExperience" placeholder="Work Experience Length" style="flex:1; min-width:200px;" data-i18n-placeholder="rplStudentExperience">
+                        <button class="btn btn-primary" onclick="addStudentOption()" data-i18n="rplStudentAdd">➕ Add to Selection</button>
+                        <button class="btn btn-warning" onclick="updateStudentOption()" data-i18n="rplStudentUpdate">✏️ Update Selected</button>
+                    </div>
+                    <p style="font-size:12px; color:#666; margin-top:8px;" data-i18n="rplStudentHint">Fill in the name, student ID, prior education level, and supporting data to add or update a student.</p>
+                </div>
+                <!-- GLOBAL TOOLBAR -->
+                <div class="toolbar" style="margin-bottom: 0; border-radius: 5px 5px 0 0;">
+                    <button class="btn btn-info" onclick="showSection('daftar-mk')" data-i18n="rplBack">⬅️ Back</button>
+                    <label style="color:white; margin-right:5px;" data-i18n="rplStudentLabel">Student:</label>
+                    <select id="selectStudentAssess" style="min-width: 200px;" onchange="handleStudentChange()">
+                        <option value="" data-i18n="rplStudentSelect">-- Select Student --</option>
+                    </select>
+                    <input type="text" id="inputStudentGradYear" placeholder="Graduation Year" style="min-width:120px;" oninput="updateStudentGraduationYear(this.value)" data-i18n-placeholder="rplGradYear">
+                    
+                    <label style="color:white; margin:0 5px;" data-i18n="rplAssessorLabel">Assessor:</label>
+                    <select id="selectAssessor" style="min-width: 150px;" onchange="syncAssessorName()">
+                        <option value="Sepfitrah, ST. MT">Sepfitrah, ST. MT</option>
+                        <option value="Dr. Julnaidi, ST. MT">Dr. Julnaidi, ST. MT</option>
+                        <option value="Dr. Ir. Dahlil, MT, IPU">Dr. Ir. Dahlil, MT, IPU</option>
+                    </select>
+                </div>
+
+                <!-- TABS -->
+                <div id="sub-tabs-container" class="sub-tabs" style="margin-top:0; background: #333; padding: 0 15px; border-radius: 0 0 5px 5px; border-bottom: none; gap: 2px;">
+                    <div id="tab-transfer" class="sub-tab" onclick="switchSubTab('transfer')" data-i18n="rplTabTransfer">1. Credit Transfer</div>
+                    <div id="tab-perolehan" class="sub-tab" onclick="switchSubTab('perolehan')" data-i18n="rplTabRecognition">2. Competency Recognitions</div>
+                    <div id="tab-conclusion" class="sub-tab" onclick="switchSubTab('conclusion')" data-i18n="rplTabConclusion">3. Conclusion</div>
+                    <div id="tab-open" class="sub-tab" onclick="switchSubTab('open')" data-i18n="rplTabOpen">4. Open Assessment</div>
+                    <div id="tab-panduan" class="sub-tab" onclick="switchSubTab('panduan')" data-i18n="rplTabGuide">5. RPL Guide</div>
+                </div>
+
+                <!-- CONTENT WRAPPER -->
+                <div style="padding: 20px; border: 1px solid #ddd; border-top: none; background: #fff;">
+
+                    <!-- 0. VIEW: OPEN ASSESSMENT -->
+                    <div id="view-open" class="tab-view" style="display:none;">
+                        <div style="margin-bottom:15px;">
+                            <h4 data-i18n="rplOpenTitle">Open Assessment (Import File)</h4>
+                            <p style="font-size:12px; color:#666;" data-i18n="rplOpenSubtitle">Upload a saved assessment file (CSV/JSON) to load the full RPL assessment data.</p>
+                        </div>
+                        <div style="display:flex; flex-wrap:wrap; gap:10px; align-items:center;">
+                            <input type="file" id="openAssessmentFile" accept=".csv,.json" style="background:#fff; border:1px solid #ccc; padding:6px;">
+                            <button class="btn btn-primary" onclick="loadAssessmentFile()" data-i18n="rplOpenBtn">📂 Open Assessment</button>
+                            <button class="btn btn-success" onclick="saveAssessmentJSON()" data-i18n="rplSaveFile">💾 Save File</button>
+                            <button class="btn btn-info" onclick="switchSubTab('transfer')" data-i18n="rplBackToAssessment">⬅️ Back to Assessment</button>
+                        </div>
+                        <div id="open-status" style="margin-top:12px; font-size:12px; color:#666;"></div>
+                    </div>
+
+                    <!-- 0. VIEW: RPL GUIDE -->
+                    <div id="view-panduan" class="tab-view" style="display:none;">
+                        <div style="margin-bottom:15px;">
+                            <h4 data-i18n="rplGuideTitle">RPL Guide (PDF)</h4>
+                            <p style="font-size:12px; color:#666;" data-i18n="rplGuideSubtitle">Upload the RPL guide document in PDF format. The document will be shown for reading.</p>
+                        </div>
+                        <div style="display:flex; flex-wrap:wrap; gap:10px; align-items:center; margin-bottom:15px;">
+                            <input type="file" id="panduanFile" accept="application/pdf" style="background:#fff; border:1px solid #ccc; padding:6px;">
+                            <button class="btn btn-primary" onclick="loadPanduanPDF()" data-i18n="rplGuideLoad">📥 Load Guide</button>
+                            <button class="btn btn-success" onclick="savePanduanPDF()" data-i18n="rplGuideSave">💾 Save Guide</button>
+                            <button class="btn btn-danger" onclick="clearPanduanPDF()" data-i18n="rplGuideDelete">🗑️ Delete Guide</button>
+                            <button class="btn btn-info" onclick="switchSubTab('transfer')" data-i18n="rplBackToAssessment">⬅️ Back to Assessment</button>
+                        </div>
+                        <div id="panduan-status" style="margin-bottom:12px; font-size:12px; color:#666;"></div>
+                        <div style="margin-bottom:12px; border:1px dashed #ccc; padding:10px; border-radius:6px; background:#fff;">
+                            <div id="panduan-list" style="display:flex; flex-wrap:wrap; gap:8px;"></div>
+                        </div>
+                        <div style="border:1px solid #ddd; border-radius:6px; overflow:hidden; background:#fafafa;">
+                            <iframe id="panduan-preview" title="RPL Guide" style="width:100%; height:600px; border:none;"></iframe>
+                        </div>
+                    </div>
+                    
+                    <!-- 1. VIEW: TRANSFER -->
+                    <div id="view-transfer" class="tab-view" style="display:none;">
+                        <div class="toolbar" style="background: #eee; border: 1px solid #ddd; color: #333; margin-bottom: 20px;">
+                            <button class="btn btn-success" onclick="saveTransfer()" data-i18n="rplTransferSave">💾 Save Transfer</button>
+                            <button class="btn btn-info" onclick="printTransferReport()" data-i18n="rplTransferPrint">🖨️ Print Transfer</button>
+                            <div style="flex-grow:1;"></div>
+                            <button class="btn btn-danger" onclick="clearTransfer()" data-i18n="rplTransferReset">🗑️ Reset</button>
+                        </div>
+                        <div id="transfer-view" class="transfer-container screen-only">
+                            <p style="text-align:center; color:#666;" data-i18n="rplTransferEmpty">Please select a student first.</p>
+                        </div>
+                        <div id="transfer-print-area" class="print-area print-only"></div>
+                    </div>
+
+                    <!-- 2. VIEW: PEROLEHAN SKS -->
+                    <div id="view-perolehan" class="tab-view" style="display:none;">
+                        <div class="toolbar" style="background: #eee; border: 1px solid #ddd; color: #333; margin-bottom: 20px;">
+                             <div style="margin-right:10px;">
+                                 <label style="font-size:12px; font-weight:bold;" data-i18n="rplRecognitionSelect">Select a course for assessment:</label><br>
+                                 <select id="selectMKAsesmen" onchange="setPerolehanCourse(this.value)" style="background:white; color:black; border:1px solid #aaa; max-width:320px;">
+                                     <option value="" data-i18n="rplRecognitionSelectOption">-- Select Course --</option>
+                                 </select>
+                             </div>
+                             <div style="flex-grow:1;"></div>
+                            <button class="btn btn-warning" onclick="addPerolehanCourseTable()" data-i18n="rplRecognitionAdd">➕ Add Assessment</button>
+                            <button class="btn btn-success" onclick="saveAssessment()" data-i18n="rplRecognitionSave">💾 Save Assessment</button>
+                            <button class="btn btn-info" onclick="window.print()" data-i18n="rplRecognitionPrint">🖨️ Print</button>
+                            <button class="btn btn-info" onclick="switchSubTab('transfer')" data-i18n="rplRecognitionBack">⬅️ Back</button>
+                            <button class="btn btn-danger" onclick="clearAssessmentEditor()" data-i18n="rplRecognitionReset">🗑️ Reset</button>
+                        </div>
+                        <div id="perolehan-table-container" class="screen-only"></div>
+                        <div id="perolehan-print-area" class="print-area print-only"></div>
+                    </div>
+
+                    <!-- 3. VIEW: CONCLUSION -->
+                    <div id="view-conclusion" class="tab-view" style="display:none;">
+                        <div class="toolbar" style="background: #eee; border: 1px solid #ddd; color: #333; margin-bottom: 20px;">
+                             <div style="flex-grow:1;"></div>
+                             <button class="btn btn-info" onclick="renderConclusion()" data-i18n="rplConclusionRefresh">🔄 Refresh Data</button>
+                             <button class="btn btn-primary" onclick="window.print()" data-i18n="rplConclusionPrint">🖨️ Print Recognition Report</button>
+                        </div>
+                        <div id="conclusion-stats" class="summary-cards" style="display:none;">
+                            <div class="card">
+                                <div class="stat-val" id="con-total-recognized" style="font-size:24px; font-weight:bold; color:var(--primary-color);">0</div>
+                                <div class="stat-label" data-i18n="rplConclusionTotal">Total Recognized Credits</div>
+                            </div>
+                            <div class="card">
+                                <div class="stat-val" id="con-total-transfer" style="font-size:24px; font-weight:bold; color:var(--primary-color);">0</div>
+                                <div class="stat-label" data-i18n="rplConclusionTransfer">Total Transfer Credits</div>
+                            </div>
+                            <div class="card">
+                                <div class="stat-val" id="con-total-perolehan" style="font-size:24px; font-weight:bold; color:var(--primary-color);">0</div>
+                                <div class="stat-label" data-i18n="rplConclusionRecognition">Total Recognition Credits</div>
+                            </div>
+                            <div class="card">
+                                <div class="stat-val" id="con-total-remaining" style="font-size:24px; font-weight:bold; color:var(--primary-color);">0</div>
+                                <div class="stat-label" data-i18n="rplConclusionRemaining">Remaining Credits Required</div>
+                            </div>
+                        </div>
+                        <div id="conclusion-table-container" class="print-area print-limit-3pages"></div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- REMOVED SEPARATE TRANSFER & CONCLUSION SECTIONS -->
+
+
+    </main>
+
+    <!-- SCRIPT LOGIC -->
+    <script>
+        // 1. DATABASE MATA KULIAH (FULL DATABASE - 30 MKs for Demo)
+        const courseDatabase = {
+            // MKU (General Courses)
+            "MKU10112": { code: "MKU 10112", name: "Religious Education", name_id: "Pendidikan Agama", name_en: "Religious Education", sks: 2, semester: "I", desc: "Islamic religious education." },
+            "MKU10212": { code: "MKU 10212", name: "Pancasila Education", name_id: "Pendidikan Pancasila", name_en: "Pancasila Education", sks: 2, semester: "I", desc: "Pancasila as the national ideology." },
+            "MKU10322": { code: "MKU 10312", name: "Civics Education", name_id: "Pendidikan Kewarganegaraan", name_en: "Civics Education", sks: 2, semester: "II", desc: "Citizenship insight and national resilience." },
+            "MKU10412": { code: "MKU 10412", name: "English", name_id: "Bahasa Inggris", name_en: "English", sks: 2, semester: "I", desc: "English language." },
+            "MKU10522": { code: "MKU 10522", name: "Indonesian Language", name_id: "Bahasa Indonesia", name_en: "Indonesian Language", sks: 2, semester: "II", desc: "Effective Indonesian language usage." },
+            
+            // MID (Mathematics & Basic Sciences)
+            "MID10612": { code: "MID 10612", name: "Physics I", sks: 2, semester: "I", desc: "Basic concepts of physics." },
+            "MID11411": { code: "MID 11411", name: "Physics Lab I", sks: 1, semester: "I", desc: "Fundamental physics phenomena." },
+            "MID10722": { code: "MID 10722", name: "Physics II", sks: 2, semester: "II", desc: "Energy and electricity." },
+            "MID11521": { code: "MID 11521", name: "Physics Lab II", sks: 1, semester: "II", desc: "Energy and electricity phenomena." },
+            "MID10813": { code: "MID 10813", name: "Calculus I", sks: 3, semester: "I", desc: "Matrices and introductory calculus." },
+            "MID10923": { code: "MID 10923", name: "Calculus II", sks: 3, semester: "II", desc: "Integral and differential calculus." },
+            "MID11012": { code: "MID 11012", name: "Applied Chemistry", sks: 2, semester: "I", desc: "Chemistry applications for engineering." },
+            "MID11133": { code: "MID 11133", name: "Engineering Mathematics I", sks: 3, semester: "III", desc: "Calculus and vector algebra." },
+            "MID11243": { code: "MID 11243", name: "Engineering Mathematics II", sks: 3, semester: "IV", desc: "Differential equations and linear systems." },
+            "MID11332": { code: "MID 11332", name: "Statistics", sks: 2, semester: "III", desc: "Data processing and statistics." },
+            
+            // MDT (Mechanical Engineering Fundamentals)
+            "MDT11612": { code: "MDT 11612", name: "Engineering Mechanics I", sks: 2, semester: "I", desc: "Rigid body equilibrium." },
+            "MDT11722": { code: "MDT 11722", name: "Engineering Mechanics II", sks: 2, semester: "II", desc: "Stress and strain in structures." },
+            "MDT11822": { code: "MDT 11822", name: "Materials Science", sks: 2, semester: "II", desc: "Classification and properties of engineering materials." },
+            "MDT11932": { code: "MDT 11932", name: "Kinematics", sks: 2, semester: "III", desc: "Mechanism kinematics." },
+            "MDT12042": { code: "MDT 12042", name: "Dynamics", sks: 2, semester: "IV", desc: "Motion analysis in mechanics." },
+            "MDT12152": { code: "MDT 12152", name: "Mechanical Vibrations", sks: 2, semester: "V", desc: "Machine vibration analysis." },
+            "MDT12232": { code: "MDT 12232", name: "Thermodynamics I", sks: 2, semester: "III", desc: "Thermodynamic energy systems I." },
+            "MDT12342": { code: "MDT 12342", name: "Thermodynamics II", sks: 2, semester: "IV", desc: "Thermodynamic energy systems II." },
+            "MDT12432": { code: "MDT 12432", name: "Fluid Mechanics", sks: 2, semester: "III", desc: "Static and dynamic fluids." },
+            "MDT12543": { code: "MDT 12543", name: "Heat Transfer", sks: 3, semester: "IV", desc: "Heat transfer through piping." },
+            "MDT12622": { code: "MDT 12622", name: "Engineering Measurement", sks: 2, semester: "II", desc: "Measurement and metrology." },
+            "MDT11932": { code: "MDT 11932", name: "Kinematics", sks: 2, semester: "III", desc: "Relative motion (position, velocity, acceleration)." },
+            "MDT12742": { code: "MDT 12742", name: "Electrical Power Engineering", sks: 2, semester: "IV", desc: "Power generation and utilization systems." },
+            "MDT12872": { code: "MDT 12872", name: "Fluid Machines", sks: 2, semester: "VII", desc: "Pumps and compressors." },
+            "MDT12972": { code: "MDT 12972", name: "Physical Metallurgy Lab", sks: 2, semester: "VII", desc: "Material hardness, testing, and metallography." },
+
+            // MPP (Engineering Planning & Projects)
+            "MPP13013": { code: "MPP 13013", name: "Engineering Drawing", sks: 3, semester: "I", desc: "ISO, ANSI, JIS drawing standards." },
+            "MPP13142": { code: "MPP 13142", name: "Quality Control", sks: 2, semester: "IV", desc: "Production process statistics." },
+            "MPP13253": { code: "MPP 13253", name: "Machining & Welding", sks: 3, semester: "V", desc: "Conventional machining and welding." },
+            "MPP13362": { code: "MPP 13362", name: "Machining Practice", sks: 2, semester: "VI", desc: "Hands-on workshop practice." },
+            "MPP13463": { code: "MPP 13463", name: "Refrigeration Engineering", sks: 3, semester: "VI", desc: "Refrigeration and air conditioning systems." },
+            "MPP13533": { code: "MPP 13533", name: "Machine Elements I", sks: 3, semester: "III", desc: "Basic machine element design." },
+            "MPP13643": { code: "MPP 13643", name: "Machine Elements II", sks: 3, semester: "IV", desc: "Advanced machine element design." },
+            "MPP13762": { code: "MPP 13762", name: "Energy Conversion Machines", sks: 3, semester: "VI", desc: "Energy conversion systems." },
+            "MPP13852": { code: "MPP 13852", name: "Mechatronics", sks: 2, semester: "V", desc: "Integration of electronics and mechanics." },
+            "MPP13933": { code: "MPP 13933", name: "CAD & Product Design", sks: 3, semester: "III", desc: "Parametric 3D design applications." },
+            "MPP14082": { code: "MPP 14082", name: "Industrial Internship", sks: 2, semester: "VIII", desc: "Industrial field observation." },
+            "MPP14171": { code: "MPP 14171", name: "Seminar", sks: 1, semester: "VII", desc: "Research proposal presentation." },
+            "MPP 14284": { code: "MPP 14284", name: "Final Project", sks: 4, semester: "VIII", desc: "Independent final thesis." },
+
+            // MML (Local Content)
+            "MML 14312": { code: "MML 14312", name: "OHS & Labor Law", sks: 2, semester: "I", desc: "Occupational health and safety standards." },
+            "MML 16622": { code: "MML 16622", name: "Computers & Networks", sks: 2, semester: "II", desc: "Computer and network fundamentals." },
+            "MML 14432": { code: "MML 14432", name: "Industrial Management", sks: 2, semester: "III", desc: "Basic industrial management." },
+            "MML 14522": { code: "MML 14522", name: "Maintenance Engineering", sks: 2, semester: "II", desc: "Industrial machine maintenance." },
+            "MML 14642": { code: "MML 14642", name: "Research Methodology", sks: 2, semester: "IV", desc: "Engineering research methodology." },
+            "MML 14842": { code: "MML 14842", name: "Technology Concepts", sks: 2, semester: "IV", desc: "Fundamental technology concepts." },
+            "MML 14752": { code: "MML 14752", name: "Numerical Computing", sks: 2, semester: "V", desc: "Numerical methods with CAE." },
+            "MML 14952": { code: "MML 14952", name: "Pneumatics & Hydraulics", sks: 2, semester: "V", desc: "Fluid power systems." },
+            "MML 15053": { code: "MML 15053", name: "Internal Combustion & Propulsion", sks: 3, semester: "V", desc: "Combustion engines and propulsion." },
+            "MML 15152": { code: "MML 15152", name: "Piping Design", sks: 2, semester: "V", desc: "Piping system design." },
+            "MML 15252": { code: "MML 15252", name: "Environmental Engineering", sks: 2, semester: "V", desc: "Environmental impact of machinery." },
+            "MML 15362": { code: "MML 15362", name: "Jig & Fixture Planning", sks: 2, semester: "VI", desc: "Production tooling planning." },
+            "MML 15462": { code: "MML 15462", name: "Boilers", sks: 2, semester: "VI", desc: "Steam generator systems." },
+            "MML 15563": { code: "MML 15563", name: "NC & CAM Programming", sks: 3, semester: "VI", desc: "Modern NC and CAM." },
+            "MML 15661": { code: "MML 15661", name: "Machine Performance Lab", sks: 1, semester: "VI", desc: "Machine performance testing." },
+            "MML 15762": { code: "MML 15762", name: "Heat Treatment", sks: 2, semester: "VI", desc: "Heat treatment for engineering materials." },
+            "MML 15872": { code: "MML 15872", name: "Automotive Mechanics", sks: 2, semester: "VII", desc: "Automotive fundamentals." },
+            "MML 15972": { code: "MML 15972", name: "Failure Analysis: Methods & Cases", sks: 2, semester: "VII", desc: "Failure analysis of machine components." },
+            "MML 16071": { code: "MML 16071", name: "Basic Machine Phenomena Lab", sks: 1, semester: "VII", desc: "Fundamental machine experiments." },
+            "MML 16172": { code: "MML 16172", name: "Power Generation Systems", sks: 2, semester: "VII", desc: "Electric power systems." },
+            "MML 16262": { code: "MML 16262", name: "Engineering & Cost Analysis", sks: 2, semester: "VI", desc: "Engineering and cost analysis." },
+            "MML 16352": { code: "MML 16352", name: "Material Handling Equipment", sks: 2, semester: "V", desc: "Material handling systems." },
+            "MML 16532": { code: "MML 16532", name: "Casting & Forming", sks: 2, semester: "III", desc: "Metal casting and forming processes." },
+            "MML 16483": { code: "MML 16483", name: "Entrepreneurship Internship", sks: 3, semester: "VIII", desc: "Entrepreneurship fieldwork." }
+        };
+
+        // Initialize CSV data for each course to allow RPS generation
+        for (let key in courseDatabase) {
+            const c = courseDatabase[key];
+            if (!c.csv) {
+                // Mock CSV Structure
+                c.csv = `header,name,${c.name}
+header,code,${c.code}
+header,sks,${c.sks}
+header,semester,${c.semester}
+header,desc,${c.desc}
+header,prereq,-
+header,ref,Primary Textbook ${c.name}
+schedule,1,CPMK-01,Understand the fundamental concepts of ${c.name},Introduction,Course Contract,100,Slides/Projector,Lecture,Ref 1,Not Assessed
+schedule,2,CPMK-02,Explain the main theory,Core Theory,Definitions and Functions,100,Slides/Projector,Discussion,Ref 1,Not Assessed
+schedule,3,CPMK-03,Apply the basic formulas,Basic Applications,Simple Case Studies,100,Whiteboard,Practice,Ref 1,Not Assessed
+schedule,4,CPMK-04,Evaluate initial understanding,Quiz 1,Topics from meetings 1-3,50,Question Sheet,Written Exam,Ref 1,Not Assessed`;
+            }
+        }
+
+        function ensureCourseCSVData() {
+            for (let key in courseDatabase) {
+                const c = courseDatabase[key];
+                if (!c.csv) {
+                    c.csv = `header,name,${c.name}
+header,code,${c.code}
+header,sks,${c.sks}
+header,semester,${c.semester}
+header,desc,${c.desc}
+header,prereq,-
+header,ref,Primary Textbook ${c.name}
+schedule,1,CPMK-01,Understand the fundamental concepts of ${c.name},Introduction,Course Contract,100,Slides/Projector,Lecture,Ref 1,Not Assessed
+schedule,2,CPMK-02,Explain the main theory,Core Theory,Definitions and Functions,100,Slides/Projector,Discussion,Ref 1,Not Assessed
+schedule,3,CPMK-03,Apply the basic formulas,Basic Applications,Simple Case Studies,100,Whiteboard,Practice,Ref 1,Not Assessed
+schedule,4,CPMK-04,Evaluate initial understanding,Quiz 1,Topics from meetings 1-3,50,Question Sheet,Written Exam,Ref 1,Not Assessed`;
+                }
+            }
+        }
+
+        function saveCourseDatabaseToStorage() {
+            localStorage.setItem('courseDatabase', JSON.stringify(courseDatabase));
+        }
+
+        function loadCourseDatabaseFromStorage() {
+            const raw = localStorage.getItem('courseDatabase');
+            if (!raw) return;
+            try {
+                const parsed = JSON.parse(raw);
+                Object.keys(parsed).forEach(key => {
+                    courseDatabase[key] = parsed[key];
+                });
+            } catch (e) {
+                console.error('Gagal memuat data RPS tersimpan', e);
+            }
+        }
+
+        // 2. DATABASE MAHASISWA & ASESSMENT
+        const studentDatabase = {
+            "MHS001": { 
+                id: "MHS001", 
+                name: "Ahmad Dahlan", 
+                asal: "Politeknik (D3)", 
+                transcript: [
+                    { mk: "Matematika 1", sks: 2, grade: "A" },
+                    { mk: "Fisika Dasar", sks: 2, grade: "B" },
+                    { mk: "Gambar Teknik", sks: 3, grade: "A" },
+                    { mk: "Bahasa Inggris", sks: 2, grade: "B" }
+                ] 
+            },
+            "MHS002": { 
+                id: "MHS002", 
+                name: "Siti Aminah", 
+                asal: "Akademi (D4)", 
+                transcript: [
+                    { mk: "Kalkulus Lanjut", sks: 3, grade: "A" },
+                    { mk: "Termodinamika", sks: 3, grade: "B" },
+                    { mk: "Mekanika Fluida", sks: 3, grade: "A" }
+                ] 
+            }
+        };
+        let assessmentDatabase = {}; 
+        let currentCourseData = {};
+        let scheduleData = [];
+        let loadedCourseCode = null;
+        let isEditMode = false;
+        let isAssessmentMode = false;
+        const cpmkCodes = [
+            { code: 'CPMK-01', label: 'CPMK-01' },
+            { code: 'CPMK-02', label: 'CPMK-02' },
+            { code: 'CPMK-03', label: 'CPMK-03' },
+            { code: 'CPMK-04', label: 'CPMK-04' },
+            { code: 'CPMK-05', label: 'CPMK-05' }
+        ];
+
+        // 3. INITIALIZATION
+        window.onload = function() {
+            loadCourseDatabaseFromStorage();
+            ensureCourseCSVData();
+            populateDropdowns();
+            renderCourseList();
+            populateStudentSelects();
+            showSection('daftar-mk'); // Default ke Daftar MK
+
+            const assessorSelect = document.getElementById('selectAssessor');
+            if (assessorSelect) {
+                assessorSelect.addEventListener('change', syncAssessorName);
+            }
+
+            initLanguage();
+        };
+
+        function populateDropdowns() {
+            // RPS Dropdown
+            const selectRPS = document.getElementById('selectRPS');
+            for (let key in courseDatabase) {
+                let opt = document.createElement('option');
+                opt.value = key;
+                opt.innerText = courseDatabase[key].code + " - " + courseDatabase[key].name;
+                selectRPS.appendChild(opt);
+            }
+        }
+
+        function populateStudentSelects() {
+            // Only one master select now
+            const ids = ['selectStudentAssess'];
+            ids.forEach(id => {
+                const el = document.getElementById(id);
+                if(!el) return;
+                el.innerHTML = '<option value="">-- Select Student --</option>';
+                for(let key in studentDatabase) {
+                    let opt = document.createElement('option');
+                    opt.value = studentDatabase[key].id;
+                    opt.innerText = `${studentDatabase[key].name} - ${studentDatabase[key].asal}`;
+                    el.appendChild(opt);
+                }
+                el.onchange = () => {
+                    handleStudentChange();
+                    const selectedId = el.value;
+                    if (!selectedId || !studentDatabase[selectedId]) return;
+                    const student = studentDatabase[selectedId];
+                    const nameInput = document.getElementById('inputNewStudentName');
+                    const nimInput = document.getElementById('inputNewStudentNim');
+                    const campusInput = document.getElementById('inputNewStudentCampus');
+                    const birthInput = document.getElementById('inputNewStudentBirth');
+                    const originNimInput = document.getElementById('inputNewStudentOriginNim');
+                    const jobInput = document.getElementById('inputNewStudentJob');
+                    const experienceInput = document.getElementById('inputNewStudentExperience');
+                    const yearInput = document.getElementById('inputNewStudentGradYear');
+                    if(nameInput) nameInput.value = student.name || '';
+                    if(nimInput) nimInput.value = student.id || '';
+                    if(campusInput) campusInput.value = student.asal || '';
+                    if(birthInput) birthInput.value = student.tempatTanggalLahir || '';
+                    if(originNimInput) originNimInput.value = student.nimAsal || '';
+                    if(jobInput) jobInput.value = student.pekerjaan || '';
+                    if(experienceInput) experienceInput.value = student.pengalamanKerja || '';
+                    if(yearInput) yearInput.value = student.tahunLulus || '';
+                };
+            });
+        }
+
+        function addStudentOption() {
+            const nameInput = document.getElementById('inputNewStudentName');
+            const nimInput = document.getElementById('inputNewStudentNim');
+            const campusInput = document.getElementById('inputNewStudentCampus');
+            const birthInput = document.getElementById('inputNewStudentBirth');
+            const originNimInput = document.getElementById('inputNewStudentOriginNim');
+            const jobInput = document.getElementById('inputNewStudentJob');
+            const experienceInput = document.getElementById('inputNewStudentExperience');
+            if(!nameInput || !nimInput || !campusInput) return;
+
+            const yearInput = document.getElementById('inputNewStudentGradYear');
+            const name = nameInput.value.trim();
+            const nim = nimInput.value.trim();
+            const campus = campusInput.value.trim();
+            const birth = birthInput ? birthInput.value.trim() : '';
+            const originNim = originNimInput ? originNimInput.value.trim() : '';
+            const job = jobInput ? jobInput.value.trim() : '';
+            const experience = experienceInput ? experienceInput.value.trim() : '';
+            const gradYear = yearInput ? yearInput.value.trim() : '';
+            if(!name || !nim || !campus) {
+                alert('Please complete the Student Name, Student ID, and Prior Education Level first.');
+                return;
+            }
+
+            const id = nim || `MHS${Date.now()}`;
+            studentDatabase[id] = {
+                id,
+                name,
+                asal: campus,
+                tahunLulus: gradYear,
+                tempatTanggalLahir: birth,
+                nimAsal: originNim,
+                pekerjaan: job,
+                pengalamanKerja: experience,
+                transcript: []
+            };
+
+            populateStudentSelects();
+            document.getElementById('selectStudentAssess').value = id;
+            handleStudentChange();
+
+            nameInput.value = '';
+            nimInput.value = '';
+            campusInput.value = '';
+            if(birthInput) birthInput.value = '';
+            if(originNimInput) originNimInput.value = '';
+            if(jobInput) jobInput.value = '';
+            if(experienceInput) experienceInput.value = '';
+            if(yearInput) yearInput.value = '';
+        }
+
+        function updateStudentOption() {
+            const selectEl = document.getElementById('selectStudentAssess');
+            if(!selectEl || !selectEl.value) {
+                alert('Please select a student from the list first.');
+                return;
+            }
+
+            const stdId = selectEl.value;
+            const nameInput = document.getElementById('inputNewStudentName');
+            const nimInput = document.getElementById('inputNewStudentNim');
+            const campusInput = document.getElementById('inputNewStudentCampus');
+            const birthInput = document.getElementById('inputNewStudentBirth');
+            const originNimInput = document.getElementById('inputNewStudentOriginNim');
+            const jobInput = document.getElementById('inputNewStudentJob');
+            const experienceInput = document.getElementById('inputNewStudentExperience');
+            const yearInput = document.getElementById('inputNewStudentGradYear');
+
+            const name = nameInput ? nameInput.value.trim() : '';
+            const nim = nimInput ? nimInput.value.trim() : '';
+            const campus = campusInput ? campusInput.value.trim() : '';
+            if(!name || !nim || !campus) {
+                alert('Please complete the Student Name, Student ID, and Prior Education Level first.');
+                return;
+            }
+
+            const student = studentDatabase[stdId] || {};
+            student.name = name;
+            student.id = nim || student.id;
+            student.asal = campus;
+            student.tempatTanggalLahir = birthInput ? birthInput.value.trim() : '';
+            student.nimAsal = originNimInput ? originNimInput.value.trim() : '';
+            student.pekerjaan = jobInput ? jobInput.value.trim() : '';
+            student.pengalamanKerja = experienceInput ? experienceInput.value.trim() : '';
+            student.tahunLulus = yearInput ? yearInput.value.trim() : '';
+            studentDatabase[stdId] = student;
+
+            populateStudentSelects();
+            selectEl.value = student.id;
+            handleStudentChange();
+        }
+
+        function renderCourseList() {
+            const container = document.getElementById('course-list-container');
+            const searchValue = document.getElementById('searchMK').value.toLowerCase();
+            const grandTotalEl = document.getElementById('grand-total-sks');
+            
+            container.innerHTML = '';
+            let totalSKS = 0;
+            const entries = Object.entries(courseDatabase);
+            const filtered = entries.filter(([key, c]) => {
+                const namePool = [c.name, c.name_id, c.name_en].filter(Boolean).map(val => val.toLowerCase());
+                return namePool.some(val => val.includes(searchValue)) || c.code.toLowerCase().includes(searchValue);
+            });
+
+            if (filtered.length === 0) {
+                container.innerHTML = '<p style="text-align:center; padding: 20px;">No courses found.</p>';
+                if(grandTotalEl) grandTotalEl.innerText = 0;
+                return;
+            }
+
+            const oddSemesters = ['I', 'III', 'V', 'VII'];
+            const evenSemesters = ['II', 'IV', 'VI', 'VIII'];
+
+            const grouped = {};
+            filtered.forEach(([key, c]) => {
+                if (!grouped[c.semester]) grouped[c.semester] = [];
+                grouped[c.semester].push({ key, ...c });
+                totalSKS += parseInt(c.sks);
+            });
+
+            const maxRows = Math.max(oddSemesters.length, evenSemesters.length);
+            let html = '<table class="semester-table">';
+            for (let i = 0; i < maxRows; i++) {
+                const odd = oddSemesters[i];
+                const even = evenSemesters[i];
+
+                html += '<tr>';
+                html += `<td class="semester-cell">${renderSemesterGroup(odd, grouped[odd] || [], 'Odd Semester')}</td>`;
+                html += `<td class="semester-cell">${renderSemesterGroup(even, grouped[even] || [], 'Even Semester')}</td>`;
+                html += '</tr>';
+            }
+            html += '</table>';
+            container.innerHTML = html;
+
+            if(grandTotalEl) grandTotalEl.innerText = totalSKS;
+        }
+
+        function renderSemesterGroup(semester, courses, labelPrefix) {
+            if (!semester) return '';
+            const title = courses.length ? `${t('semesterLabel')} ${semester}` : `${labelPrefix} (${t('emptyLabel')})`;
+
+            let html = `<div class="semester-group">
+                <div class="semester-header">${title}</div>
+                <ul class="course-list">`;
+
+            if (courses.length === 0) {
+                html += `<li class="course-item" style="color:#777;">${t('emptyCourses')}</li>`;
+            } else {
+                courses.forEach((c) => {
+                    html += `
+                        <li class="course-item">
+                            <div style="display:flex; align-items:center; justify-content:space-between; gap:10px;">
+                                <h4 style="margin:0; flex:1;">${getCourseDisplayName(c.key)}</h4>
+                                <button class="btn btn-primary" style="padding:4px 8px; font-size:11px;" onclick="loadCourseFromSelect('${c.key}')">📝 ${t('viewRps')}</button>
+                            </div>
+                            <div class="meta">
+                                <span><strong>${t('courseCode')}:</strong> ${c.code}</span>
+                                <span><strong>${t('courseCredits')}:</strong> ${c.sks}</span>
+                            </div>
+                            <div style="font-size:12px; color:#666;">${c.desc}</div>
+                        </li>
+                    `;
+                });
+            }
+
+            html += `</ul>
+                <div class="semester-summary">Total Credits Semester ${semester}: <strong>${courses.reduce((sum, c) => sum + parseInt(c.sks), 0)}</strong></div>
+            </div>`;
+
+            return html;
+        }
+
+        // Alias for search input
+        function filterCourses() {
+            renderCourseList();
+        }
+
+        // 4. NAVIGASI
+        function showSection(id) {
+            // Hide all sections
+            document.querySelectorAll('.section').forEach(sec => sec.classList.remove('active'));
+            document.querySelectorAll('.nav-links a').forEach(link => link.classList.remove('active'));
+            
+            // Show target section
+            const target = document.getElementById(id);
+            if(target) target.classList.add('active');
+            
+            // Update active sidebar menu
+            const navId = 'nav-' + id;
+            const el = document.getElementById(navId);
+            if(el) el.classList.add('active');
+            
+            // Auto-switch sub-tabs if inside RPL
+            if(id === 'assessment') {
+                // If no student selected, maybe prompt or just show transfer
+                if(document.getElementById('selectStudentAssess').value === '') {
+                     switchSubTab('transfer');
+                } else {
+                    // refresh current view
+                    const currentTab = document.querySelector('.sub-tab.active');
+                    if(currentTab) {
+                        const tabId = currentTab.id.replace('tab-', '');
+                        switchSubTab(tabId);
+                    } else {
+                        switchSubTab('transfer');
+                    }
+                }
+            }
+        }
+
+        function updateStudentGraduationYear(yearValue = '') {
+            const stdId = document.getElementById('selectStudentAssess')?.value;
+            if(!stdId) return;
+            const year = String(yearValue || '').trim();
+            studentDatabase[stdId].tahunLulus = year;
+        }
+
+        function syncAssessorName() {
+            renderConclusion();
+            renderTransferPrint();
+            renderPerolehanPrint(collectPerolehanRows());
+        }
+
+        // 5. GENERATOR FUNCTIONS
+        function loadCourseFromSelect(code) {
+            
+            const selectRPS = document.getElementById('selectRPS');
+            if(code && selectRPS.value === '') {
+                selectRPS.value = code; 
+            }
+            
+            if(!code) {
+                code = selectRPS.value; 
+            }
+            
+            if (!code) return;
+
+            // CEK APAKAH MK INI SUDAH DI-TRANSFER
+            const stdId = document.getElementById('selectStudentAssess') ? document.getElementById('selectStudentAssess').value : '';
+            if (stdId) {
+                const key = `${stdId}_${code}`;
+                if (assessmentDatabase[key] && assessmentDatabase[key].type === 'transfer') {
+                    alert(`PERINGATAN: Mata Kuliah "${courseDatabase[code].name}" sudah disetarakan lewat Transfer SKS.\n\nTidak dapat dilakukan Asesmen Mandiri untuk mata kuliah ini.`);
+                    
+                    // Jika user berada di tab Assessment, batalkan operasi
+                    const assessmentSection = document.getElementById('assessment');
+                    if(assessmentSection.classList.contains('active')) {
+                        return;
+                    }
+                }
+            }
+
+            showSection('generator'); 
+            loadedCourseCode = code;
+            isEditMode = false;
+            document.body.classList.remove('edit-active');
+            
+            // Load from DB
+            const data = courseDatabase[code];
+            if(data && data.csv) {
+                if(parseCSV(data.csv)) {
+                    renderDocument();
+                    loadRevisionNotes(code);
+                    updateStatus(`Memuat: ${currentCourseData.name}`, 'green');
+                } else {
+                    alert("Data CSV error.");
+                }
+            } else {
+                createBlankCourseTemplate();
+            }
+        }
+
+        function createBlankCourseTemplate() {
+            currentCourseData = {
+                code: "",
+                name: "Course Name Not Set",
+                sks: 0,
+                semester: "I",
+                desc: "Description...",
+                refs: [],
+                prereq: "-"
+            };
+            scheduleData = [];
+            renderDocument();
+            updateStatus("Blank Template", 'gray');
+        }
+
+        function parseCSV(text) {
+            try {
+                currentCourseData = { refs: [] };
+                scheduleData = [];
+                const lines = text.split('\n');
+                lines.forEach(line => {
+                    const cols = line.split(',').map(c => c.trim());
+                    if (cols.length < 2) return;
+                    if (cols[0] === 'header') {
+                        const field = cols[1];
+                        const val = cols.slice(2).join(',').replace(/"/g, "");
+                        if(field.startsWith('ref')) currentCourseData.refs.push(val);
+                        else currentCourseData[field] = val;
+                    } else if (cols[0] === 'schedule') {
+                        const assessmentVal = cols[10] || 'Belum Dinilai'; 
+                        
+                        scheduleData.push({
+                            no: cols[1], cpmk: cols[2] || '', comp: cols[3], top: cols[4], 
+                            sub: cols[5]||'', time: cols[6], media: cols[7], met: cols[8], ref: cols[9],
+                            assessment: assessmentVal
+                        });
+                    }
+                });
+                return true;
+            } catch (e) { console.error(e); return false; }
+        }
+
+        function renderDocument() {
+            const container = document.getElementById('rps-preview-area');
+            
+            const createInput = (val, path, idx) => isEditMode 
+                ? `<input class="editable-input" style="width:100%;" value="${val}" oninput="updateData('${path}', '${idx}', this.value)">` 
+                : val;
+
+            const createRefInput = (val, idx) => {
+                if (!isEditMode) return val;
+                return `<input class="editable-input" style="width:100%;" value="${val}" oninput="updateData('ref', '${idx}', this.value)">`;
+            };
+
+            const revisionNotes = document.getElementById('rpsRevisionNotes')?.value || '';
+            let html = `<div class="a4-page">
+                <div class="print-header" style="display:flex; align-items:flex-start; justify-content:space-between; gap:12px;">
+                    <div style="min-width:120px; text-align:left; font-size:10px; line-height:1.2;">Form SPMI-PS-TM-04</div>
+                    <div style="flex:1; text-align:center;">
+                        <h2>SEKOLAH TINGGI TEKNOLOGI PEKANBARU</h2>
+                        <div style="font-weight:600; margin:2px 0 0;">Yayasan Dwi Sejahtera Pekanbaru</div>
+                        <h3>PROGRAM STUDI TEKNIK MESIN</h3>
+                        <p><strong>RENCANA PEMBELAJARAN SEMESTER (RPS)</strong></p>
+                    </div>
+                    <div style="min-width:90px; display:flex; justify-content:flex-end; align-items:flex-start;">
+                        <img src="logo_STTP.png" alt="Logo STT Pekanbaru" style="height:84px; margin-top:-4px;">
+                    </div>
+                </div>
+                <table style="width:100%; border:none; margin-bottom:20px;">
+                    <tr>
+                        <td style="border:none; width:150px; font-weight:bold;">Program Studi</td>
+                        <td style="border:none;">: Teknik Mesin</td>
+                        <td style="border:none; width:150px; font-weight:bold;">Tanggal Revisi</td>
+                        <td style="border:none;">: ${createInput(currentCourseData.revision_date || '', 'header', 'revision_date')}</td>
+                    </tr>
+                    <tr>
+                        <td style="border:none; font-weight:bold;">Nama Mata Kuliah</td>
+                        <td style="border:none;">: ${createInput(currentCourseData.name || '', 'header', 'name')}</td>
+                        <td style="border:none; font-weight:bold;">Otorisasi oleh</td>
+                        <td style="border:none;">:
+                            <ol style="margin-left:18px; margin-top:4px;">
+                                <li style="margin-bottom:18px;">1. Koordinator Pengembangan</li>
+                                <li style="margin-bottom:18px;">2. Dosen Pengampu</li>
+                                <li>3. KaProdi Tek Mesin</li>
+                            </ol>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="border:none; font-weight:bold;">Kode / SKS</td>
+                        <td style="border:none;">: ${currentCourseData.code || ''} / ${currentCourseData.sks || ''}</td>
+                        <td style="border:none;"></td>
+                        <td style="border:none;"></td>
+                    </tr>
+                    <tr>
+                        <td style="border:none; font-weight:bold;">Semester</td>
+                        <td style="border:none;">: ${currentCourseData.semester || ''}</td>
+                        <td style="border:none;"></td>
+                        <td style="border:none;"></td>
+                    </tr>
+                    <tr>
+                        <td style="border:none; font-weight:bold;">Deskripsi</td>
+                        <td style="border:none;">: ${createInput(currentCourseData.desc || '', 'header', 'desc')}</td>
+                        <td style="border:none;"></td>
+                        <td style="border:none;"></td>
+                    </tr>
+                </table>
+                <p><strong>Referensi:</strong></p>
+                <ol>${(currentCourseData.refs || []).map((r,i) => `<li style="display:flex; align-items:center; gap:6px;">${createRefInput(r, i)}${isEditMode ? ` <button class="btn btn-warning" style="padding:2px 6px; font-size:10px;" onclick="addReferenceAfter(${i})">Tambah</button> <button class="btn btn-danger" style="padding:2px 6px; font-size:10px;" onclick="removeReference(${i})">Hapus</button>` : ''}</li>`).join('')}</ol>
+                <p><strong>CPMK Prodi Teknik Mesin:</strong></p>
+                <ol style="margin-left:20px;">
+                    <li><strong>CPMK-01</strong> Menerapkan matematika, sains, dan prinsip rekayasa untuk menyelesaikan masalah teknik mesin yang kompleks.</li>
+                    <li><strong>CPMK-02</strong> Merancang komponen/sistem mekanikal dengan mempertimbangkan keselamatan kerja (K3), lingkungan, dan keberlanjutan.</li>
+                    <li><strong>CPMK-03</strong> Melakukan eksperimen, mengumpulkan serta menganalisis data untuk menghasilkan kesimpulan teknik yang tepat.</li>
+                    <li><strong>CPMK-04</strong> Menggunakan perangkat dan perangkat lunak modern (CAD/CAM/CAE, komputasi numerik, AI) dalam praktik keteknikan.</li>
+                    <li><strong>CPMK-05</strong> Berkomunikasi efektif, bekerja dalam tim multidisiplin, dan menjunjung etika profesi.</li>
+                </ol>
+                <p><strong>Rencana Pertemuan:</strong></p>
+                <table class="rps-table">
+                    <thead><tr><th style="width:6%">Minggu</th><th style="width:10%">CPMK</th><th style="width:24%">Sub-CPMK (Kemampuan Akhir)</th><th style="width:24%">Bahan Kajian (Materi)</th><th style="width:12%">Metode</th><th style="width:16%">Indikator Penilaian</th><th style="width:8%">Bobot</th></tr></thead>
+                    <tbody>
+            `;
+
+            const baseWeight = scheduleData.length ? Math.floor(100 / scheduleData.length) : 0;
+            const remainder = scheduleData.length ? 100 - (baseWeight * scheduleData.length) : 0;
+
+            scheduleData.forEach((row, i) => {
+                const materiText = `${row.top || ''}${row.sub ? ' - ' + row.sub : ''}`.trim();
+                let indikatorCell = '';
+
+                if (isAssessmentMode) {
+                    indikatorCell = `<td>
+                        <select class="assessment-select" onchange="updateData('schedule', '${i}.assessment', this.value)">
+                            <option value="Belum Dinilai" ${row.assessment === 'Belum Dinilai' ? 'selected' : ''}>Belum Dinilai</option>
+                            <option value="Terpenuhi (Sangat Baik)" ${row.assessment === 'Terpenuhi (Sangat Baik)' ? 'selected' : ''}>Sangat Baik</option>
+                            <option value="Terpenuhi (Baik)" ${row.assessment === 'Terpenuhi (Baik)' ? 'selected' : ''}>Baik</option>
+                            <option value="Cukup" ${row.assessment === 'Cukup' ? 'selected' : ''}>Cukup</option>
+                            <option value="Perlu Bukti Tambahan" ${row.assessment === 'Perlu Bukti Tambahan' ? 'selected' : ''}>Perlu Bukti</option>
+                            <option value="Tidak Terpenuhi" ${row.assessment === 'Tidak Terpenuhi' ? 'selected' : ''}>Tidak Terpenuhi</option>
+                        </select>
+                    </td>`;
+                } else {
+                    indikatorCell = `<td>${createInput(row.assessment || '', 'schedule', i+'.assessment')}</td>`;
+                }
+
+                const cpmkSelect = isEditMode
+                    ? `<select class="editable-input" style="width:100%;" onchange="updateData('schedule', '${i}.cpmk', this.value)">
+                        ${cpmkCodes.map(opt => {
+                            const selected = opt.code === (row.cpmk || '') ? 'selected' : '';
+                            return `<option value="${opt.code}" ${selected}>${opt.code}</option>`;
+                        }).join('')}
+                    </select>`
+                    : (row.cpmk || 'CPMK-01');
+
+                const autoWeight = scheduleData.length ? baseWeight + (i < remainder ? 1 : 0) : 0;
+                const currentWeight = (row.time !== undefined && row.time !== '') ? row.time : autoWeight;
+                if (row.time === undefined || row.time === '') {
+                    row.time = currentWeight;
+                }
+                const weightCell = isEditMode ? createInput(currentWeight, 'schedule', i+'.time') : `${currentWeight}%`;
+
+                html += `<tr>
+                    <td>${createInput(row.no, 'schedule', i+'.no')}</td>
+                    <td>${cpmkSelect}</td>
+                    <td>${createInput(row.comp, 'schedule', i+'.comp')}</td>
+                    <td>${createInput(materiText, 'schedule', i+'.top')}</td>
+                    <td>${createInput(row.met, 'schedule', i+'.met')}</td>
+                    ${indikatorCell}
+                    <td>${weightCell}</td>
+                </tr>`;
+            });
+
+            html += `</tbody></table>`;
+            if(revisionNotes) {
+                html += `
+                <div style="margin-top:16px; border-top:1px solid #000; padding-top:8px; font-size:12px;">
+                    <strong>Catatan Revisi RPS:</strong><br>${revisionNotes}
+                </div>`;
+            }
+            html += `</div>`;
+            container.innerHTML = html;
+        }
+
+        function toggleEditMode() {
+            isEditMode = !isEditMode;
+            document.body.classList.toggle('edit-active', isEditMode);
+            renderDocument();
+            const status = isEditMode ? "ON" : "OFF";
+            updateStatus(`Edit Mode: ${status}`, isEditMode ? 'red' : 'black');
+        }
+
+        function updateData(path, idx, val) {
+            if(path === 'header') {
+                currentCourseData[idx] = val;
+            } else if(path === 'ref') {
+                currentCourseData.refs[idx] = val;
+            } else if(path === 'schedule') {
+                const [i, key] = idx.split('.');
+                scheduleData[i][key] = val;
+                if (key === 'time') {
+                    updateBobotStatus();
+                }
+            }
+        }
+
+        function updateBobotStatus() {
+            const totalBobot = scheduleData.reduce((sum, row) => sum + (parseFloat(row.time) || 0), 0);
+            const statusEl = document.getElementById('status-msg');
+            if (!statusEl) return;
+            if (Math.round(totalBobot) !== 100) {
+                statusEl.textContent = `Nilai total Bobot sub CPMK tidak sama dengan 100% (Saat ini: ${totalBobot.toFixed(1)}%)`;
+                statusEl.style.color = 'red';
+            } else {
+                statusEl.textContent = `Total Bobot Sub CPMK: ${totalBobot.toFixed(1)}%`;
+                statusEl.style.color = 'green';
+            }
+        }
+
+        function addScheduleRow() {
+            if (!loadedCourseCode) {
+                alert("Pilih mata kuliah terlebih dahulu.");
+                return;
+            }
+            const nextNo = scheduleData.length + 1;
+            scheduleData.push({
+                no: String(nextNo),
+                cpmk: cpmkCodes[0]?.code || 'CPMK-01',
+                comp: "",
+                top: "",
+                sub: "",
+                time: "",
+                media: "",
+                met: "",
+                ref: (currentCourseData.refs && currentCourseData.refs[0]) ? currentCourseData.refs[0] : "",
+                assessment: "Belum Dinilai"
+            });
+            renderDocument();
+        }
+
+        function addReference() {
+            if(!currentCourseData.refs) currentCourseData.refs = [];
+            currentCourseData.refs.push("Referensi Baru");
+            renderDocument();
+        }
+
+        function addReferenceAfter(idx) {
+            if(!currentCourseData.refs) currentCourseData.refs = [];
+            currentCourseData.refs.splice(idx + 1, 0, "Referensi Baru");
+            renderDocument();
+        }
+
+        function removeReference(idx) {
+            if(!currentCourseData.refs) return;
+            currentCourseData.refs.splice(idx, 1);
+            renderDocument();
+        }
+
+        function updateStatus(msg, color) {
+            const el = document.getElementById('status-msg');
+            if(el) {
+                el.innerText = msg;
+                el.style.color = color;
+            }
+        }
+        
+        function saveToDatabase() {
+            if(!loadedCourseCode) {
+                alert("No course has been selected.");
+                return;
+            }
+
+            const totalBobot = scheduleData.reduce((sum, row) => sum + (parseFloat(row.time) || 0), 0);
+            if (Math.round(totalBobot) !== 100) {
+                alert("Total Sub-CPMK Weight must equal 100%.");
+                return;
+            }
+
+            const course = courseDatabase[loadedCourseCode] || {};
+            course.name = currentCourseData.name || course.name || '';
+            course.code = currentCourseData.code || course.code || loadedCourseCode;
+            course.sks = currentCourseData.sks || course.sks || 0;
+            course.semester = currentCourseData.semester || course.semester || '';
+            course.desc = currentCourseData.desc || course.desc || '';
+            course.prereq = currentCourseData.prereq || course.prereq || '-';
+            course.refs = currentCourseData.refs || [];
+
+            const csvLines = [];
+            csvLines.push(`header,name,${course.name}`);
+            csvLines.push(`header,code,${course.code}`);
+            csvLines.push(`header,sks,${course.sks}`);
+            csvLines.push(`header,semester,${course.semester}`);
+            csvLines.push(`header,desc,${course.desc}`);
+            csvLines.push(`header,prereq,${course.prereq}`);
+            (course.refs || []).forEach(ref => {
+                csvLines.push(`header,ref,${ref}`);
+            });
+            scheduleData.forEach(row => {
+                csvLines.push(`schedule,${row.no},${row.cpmk || 'CPMK-01'},${row.comp},${row.top},${row.sub || ''},${row.time},${row.media},${row.met},${row.ref},${row.assessment || 'Belum Dinilai'}`);
+            });
+
+            course.csv = csvLines.join('\n');
+            courseDatabase[loadedCourseCode] = course;
+
+            saveRevisionNotes();
+            saveCourseDatabaseToStorage();
+            isEditMode = false;
+            renderDocument();
+            updateStatus(`RPS ${course.name} saved. Edit Mode: OFF`, 'green');
+        }
+
+        function importRpsCSV(file) {
+            if(!file) return;
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                const text = event.target.result;
+                if(!parseCSV(text)) {
+                    alert('Gagal membaca file CSV RPS.');
+                    return;
+                }
+                renderDocument();
+                updateStatus(`CSV RPS berhasil diimpor untuk ${currentCourseData.name || 'mata kuliah'}.`, 'green');
+            };
+            reader.readAsText(file);
+        }
+
+        function resolveCourseKey() {
+            if (loadedCourseCode && courseDatabase[loadedCourseCode]) return loadedCourseCode;
+            const targetCode = (currentCourseData.code || '').trim();
+            if (!targetCode) return '';
+            const found = Object.keys(courseDatabase).find(key => courseDatabase[key].code === targetCode);
+            return found || '';
+        }
+
+        function ensureLoadedCourseForImport() {
+            const selectRPS = document.getElementById('selectRPS');
+            if (!loadedCourseCode && selectRPS && selectRPS.value) {
+                loadedCourseCode = selectRPS.value;
+            }
+            if (!loadedCourseCode) {
+                const resolved = resolveCourseKey();
+                if (resolved) {
+                    loadedCourseCode = resolved;
+                    if (selectRPS) selectRPS.value = resolved;
+                }
+            }
+            if (!loadedCourseCode) {
+                alert('Pilih RPS terlebih dahulu sebelum import.');
+                return false;
+            }
+            const baseCourse = courseDatabase[loadedCourseCode];
+            if (baseCourse) {
+                if (!currentCourseData.name) currentCourseData.name = baseCourse.name;
+                if (!currentCourseData.code) currentCourseData.code = baseCourse.code;
+                if (!currentCourseData.sks) currentCourseData.sks = baseCourse.sks;
+                if (!currentCourseData.semester) currentCourseData.semester = baseCourse.semester;
+                if (!currentCourseData.desc) currentCourseData.desc = baseCourse.desc;
+                if (!currentCourseData.prereq) currentCourseData.prereq = baseCourse.prereq || '-';
+                if (!currentCourseData.refs || !currentCourseData.refs.length) {
+                    currentCourseData.refs = baseCourse.refs || [ `Referensi Utama ${baseCourse.name}` ];
+                }
+            }
+            return true;
+        }
+
+        function importRpsJSON(file) {
+            if(!file) return;
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                try {
+                    const rawText = event.target.result || '';
+                    const jsonText = rawText.replace(/^\uFEFF/, '').trim();
+                    const sanitized = jsonText.replace(/,\s*}/g, '}').replace(/,\s*]/g, ']');
+                    const payload = JSON.parse(sanitized || '{}');
+                    if(!payload || !payload.schedule || !Array.isArray(payload.schedule)) {
+                        alert('Format JSON tidak valid untuk Rencana Pertemuan.');
+                        return;
+                    }
+
+                    if (!ensureLoadedCourseForImport()) return;
+                    const header = payload.header || {};
+                    if(header.name) currentCourseData.name = header.name;
+                    if(header.code) currentCourseData.code = header.code;
+                    if(header.sks) currentCourseData.sks = header.sks;
+                    if(header.semester) currentCourseData.semester = header.semester;
+                    if(header.desc) currentCourseData.desc = header.desc;
+                    if(header.prereq) currentCourseData.prereq = header.prereq;
+                    if(Array.isArray(header.refs)) currentCourseData.refs = header.refs;
+
+                    scheduleData = payload.schedule.map((row, index) => ({
+                        no: row.no ?? String(index + 1),
+                        cpmk: row.cpmk || 'CPMK-01',
+                        comp: row.comp || row.sub_cpmk || '',
+                        top: row.top || row.materi || '',
+                        sub: row.sub || '',
+                        time: row.time ?? row.bobot ?? '',
+                        media: row.media || '',
+                        met: row.met || row.metode || '',
+                        ref: row.ref || (currentCourseData.refs && currentCourseData.refs[0] ? currentCourseData.refs[0] : ''),
+                        assessment: row.assessment || 'Belum Dinilai'
+                    }));
+
+                    const resolved = resolveCourseKey();
+                    if (resolved) {
+                        loadedCourseCode = resolved;
+                        const selectRPS = document.getElementById('selectRPS');
+                        if (selectRPS) selectRPS.value = resolved;
+                    }
+
+                    renderDocument();
+                    updateBobotStatus();
+                    updateStatus(`JSON RPS berhasil diimpor untuk ${currentCourseData.name || 'mata kuliah'}.`, 'green');
+                } catch (error) {
+                    alert('Gagal membaca file JSON RPS. Pastikan format JSON valid (.json atau .jason).');
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        function parseSemicolonRow(line) {
+            return line.split(';').map(cell => cell.trim());
+        }
+
+        function extractBobotValue(text) {
+            if(text === undefined || text === null) return '';
+            const numeric = String(text).replace('%', '').trim();
+            return numeric;
+        }
+
+        function importRpsCSV(file) {
+            if(!file) return;
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                try {
+                    const rawText = event.target.result || '';
+                    const rows = rawText.split(/\r?\n/).map(line => line.trim()).filter(Boolean);
+                    if(rows.length < 2) {
+                        alert('File CSV kosong atau tidak valid.');
+                        return;
+                    }
+
+                    const headerRow = parseSemicolonRow(rows[0]);
+                    const expectedHeaders = ['Minggu', 'Sub-CPMK (Kemampuan Akhir)', 'Bahan Kajian (Materi)', 'Metode', 'Indikator Penilaian', 'Bobot'];
+                    const matchCount = expectedHeaders.filter((h, idx) => (headerRow[idx] || '').toLowerCase() === h.toLowerCase()).length;
+                    if(matchCount < 3) {
+                        alert('Format header CSV tidak sesuai. Gunakan: Minggu;Sub-CPMK (Kemampuan Akhir);Bahan Kajian (Materi);Metode;Indikator Penilaian;Bobot');
+                        return;
+                    }
+
+                    if (!ensureLoadedCourseForImport()) return;
+
+                    scheduleData = rows.slice(1).map((line, index) => {
+                        const cols = parseSemicolonRow(line);
+                        const week = cols[0] || String(index + 1);
+                        const comp = cols[1] || '';
+                        const materi = cols[2] || '';
+                        const metode = cols[3] || '';
+                        const indikator = cols[4] || '';
+                        const bobot = extractBobotValue(cols[5] || '');
+
+                        return {
+                            no: week,
+                            cpmk: 'CPMK-01',
+                            comp: comp,
+                            top: materi,
+                            sub: '',
+                            time: bobot,
+                            media: '',
+                            met: metode,
+                            ref: (currentCourseData.refs && currentCourseData.refs[0]) ? currentCourseData.refs[0] : '',
+                            assessment: indikator || 'Belum Dinilai'
+                        };
+                    });
+
+                    const resolved = resolveCourseKey();
+                    if (resolved) {
+                        loadedCourseCode = resolved;
+                        const selectRPS = document.getElementById('selectRPS');
+                        if (selectRPS) selectRPS.value = resolved;
+                    }
+
+                    renderDocument();
+                    updateBobotStatus();
+                    updateStatus(`CSV RPS berhasil diimpor untuk ${currentCourseData.name || 'mata kuliah'}.`, 'green');
+                } catch (error) {
+                    alert('Gagal membaca file CSV. Pastikan format sesuai contoh dengan pemisah (;).');
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        function saveRevisionNotes() {
+            if(!loadedCourseCode) return;
+            const notes = document.getElementById('rpsRevisionNotes')?.value || '';
+            const key = `rpsRevision_${loadedCourseCode}`;
+            localStorage.setItem(key, notes);
+        }
+
+        function loadRevisionNotes(code) {
+            const key = `rpsRevision_${code}`;
+            const notes = localStorage.getItem(key) || '';
+            const el = document.getElementById('rpsRevisionNotes');
+            if(el) el.value = notes;
+        }
+        
+        function exportCSV() {
+            alert("Fitur Export CSV: File 'rps_export.csv' akan diunduh.");
+        }
+        
+        function clearEditor() {
+            document.getElementById('rps-preview-area').innerHTML = "";
+            document.getElementById('selectRPS').value = "";
+            currentCourseData = {};
+            scheduleData = [];
+            loadedCourseCode = null;
+            const revisionEl = document.getElementById('rpsRevisionNotes');
+            if(revisionEl) revisionEl.value = '';
+            updateStatus("Editor dibersihkan.", "black");
+        }
+
+        // 6. ASSESSMENT LOGIC
+        
+        // MASTER HANDLER
+        function handleStudentChange() {
+            // Reload all views based on new student
+            loadTransferView();
+            // loadAssessmentView is handled dynamically when tab is active or just clears
+            document.getElementById('assessment-table-container').innerHTML = ''; // Clear assessment view
+            renderConclusion();
+            
+            // Re-trigger active tab logic
+            const activeTab = document.querySelector('.sub-tab.active');
+            if(activeTab) {
+                const tabId = activeTab.id.replace('tab-', '');
+                switchSubTab(tabId);
+            }
+        }
+
+        // --- PEROLEHAN SKS (RINGKAS CPMK) ---
+        let perolehanDrafts = {};
+
+        function buildCpmkSummary(schedule) {
+            const summary = [];
+            const maxRows = 4;
+            const chunkSize = Math.ceil(schedule.length / maxRows) || 1;
+            const totalWeight = schedule.reduce((sum, item) => sum + (parseFloat(item.time) || 0), 0);
+            for(let i = 0; i < maxRows; i++) {
+                const start = i * chunkSize;
+                const slice = schedule.slice(start, start + chunkSize);
+                if(slice.length === 0) break;
+                const label = slice.map(item => item.comp).filter(Boolean).join(' / ');
+                let weight = slice.reduce((sum, item) => sum + (parseFloat(item.time) || 0), 0);
+                if(!totalWeight) {
+                    weight = Math.round(100 / maxRows);
+                }
+                summary.push({
+                    no: i + 1,
+                    cpmk: label || `Capaian Pembelajaran ${i + 1}`,
+                    weight,
+                    comment: '',
+                    proof: '',
+                    status: 'Belum Dinilai'
+                });
+            }
+            return summary;
+        }
+
+        function applyRpsWeights(code, rows) {
+            const data = courseDatabase[code];
+            if(data && data.csv) {
+                parseCSV(data.csv);
+            }
+            const rebuild = buildCpmkSummary(scheduleData);
+            return rows.map((row, idx) => ({
+                ...row,
+                weight: rebuild[idx]?.weight ?? row.weight
+            }));
+        }
+
+        function setPerolehanCourse(code) {
+            if(!code) return;
+            addPerolehanCourseTable(code);
+        }
+
+        function addPerolehanCourseTable(code = null) {
+            const stdId = document.getElementById('selectStudentAssess').value;
+            if(!stdId) { alert('Pilih mahasiswa dulu!'); return; }
+
+            if(!code) {
+                code = document.getElementById('selectMKAsesmen').value;
+            }
+            if(!code) { alert('Pilih mata kuliah terlebih dahulu.'); return; }
+
+            const draftKey = `${stdId}_${code}`;
+            if(perolehanDrafts[draftKey]) {
+                document.getElementById(perolehanDrafts[draftKey]).scrollIntoView({ behavior: 'smooth', block: 'start' });
+                return;
+            }
+
+            // Load RPS CPMK summary (4 rows)
+            const data = courseDatabase[code];
+            if(data && data.csv) {
+                parseCSV(data.csv);
+            }
+
+            let rows = [];
+            if(assessmentDatabase[draftKey] && assessmentDatabase[draftKey].type === 'perolehan') {
+                rows = assessmentDatabase[draftKey].summaryRows || [];
+            }
+            if(rows.length === 0) {
+                rows = buildCpmkSummary(scheduleData);
+            } else {
+                const rebuild = buildCpmkSummary(scheduleData);
+                rows = rows.map((row, idx) => ({
+                    ...row,
+                    weight: rebuild[idx]?.weight ?? row.weight
+                }));
+            }
+
+            const container = document.getElementById('perolehan-table-container');
+            const sectionId = `perolehan-${draftKey}`;
+            const section = document.createElement('div');
+            section.id = sectionId;
+            section.style.marginBottom = '20px';
+            section.dataset.course = code;
+            const isLocked = !!(assessmentDatabase[draftKey] && assessmentDatabase[draftKey].type === 'perolehan');
+            section.dataset.locked = isLocked ? 'true' : 'false';
+            section.innerHTML = renderPerolehanTable(rows, code, isLocked);
+            container.appendChild(section);
+
+            perolehanDrafts[draftKey] = sectionId;
+            renderPerolehanPrint(collectPerolehanRows());
+        }
+
+        function loadPerolehanTables() {
+            const stdId = document.getElementById('selectStudentAssess').value;
+            if(!stdId) return;
+
+            perolehanDrafts = {};
+            const container = document.getElementById('perolehan-table-container');
+            container.innerHTML = '';
+
+            const transferred = [];
+            for(let key in assessmentDatabase) {
+                if(key.startsWith(stdId + '_') && assessmentDatabase[key].type === 'transfer') {
+                    transferred.push(key.split('_')[1]);
+                }
+            }
+
+            Object.keys(courseDatabase).forEach(code => {
+                if(transferred.includes(code)) return;
+                const key = `${stdId}_${code}`;
+                if(assessmentDatabase[key] && assessmentDatabase[key].type === 'perolehan') {
+                    addPerolehanCourseTable(code);
+                }
+            });
+        }
+
+        function loadPerolehanCourse(code) {
+            addPerolehanCourseTable(code);
+        }
+
+        function renderPerolehanTable(rows, code, isLocked = false) {
+            const course = courseDatabase[code];
+            const lockAttrs = isLocked ? 'disabled style="background:#f0f0f0;"' : '';
+            const lang = getLanguagePreference();
+            const dict = translations[lang] || translations.id;
+            const actions = isLocked
+                ? `<button class="btn btn-warning" style="padding:6px 10px;" onclick="editPerolehanCourse('${code}')">${dict.rplRecognitionEdit}</button>
+                   <button class="btn btn-danger" style="padding:6px 10px;" onclick="deletePerolehanCourse('${code}')">${dict.rplRecognitionDelete}</button>`
+                : `<button class="btn btn-success" style="padding:6px 10px;" onclick="savePerolehanCourse('${code}')">${dict.rplRecognitionSaveSingle}</button>`;
+
+            let html = `
+                <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:10px;">
+                    <div style="font-weight:bold; color:#555;">${dict.rplRecognitionCourseLabel}: <span data-course-label="${code}">${getCourseDisplayName(code, lang)}</span></div>
+                    <div style="display:flex; gap:8px;">${actions}</div>
+                </div>
+                <table data-course="${code}">
+                    <thead>
+                        <tr>
+                            <th style="width:5%;">${dict.rplRecognitionColNo}</th>
+                            <th style="width:35%;">${dict.rplRecognitionColSubCpmk}</th>
+                            <th style="width:10%;">${dict.rplRecognitionColWeight}</th>
+                            <th style="width:20%;">${dict.rplRecognitionColComment}</th>
+                            <th style="width:20%;">${dict.rplRecognitionColEvidence}</th>
+                            <th style="width:10%;">${dict.rplRecognitionColStatus}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            rows.forEach((row, idx) => {
+                const weight = row.weight !== undefined ? row.weight : 0;
+                const statusValue = normalizePerolehanStatus(row.status);
+                html += `
+                    <tr>
+                        <td>${row.no}</td>
+                        <td><textarea class="perolehan-cpmk" data-course="${code}" data-idx="${idx}" style="width:100%; height:60px;" ${lockAttrs}>${row.cpmk}</textarea></td>
+                        <td style="text-align:center; font-weight:bold;">${weight}%</td>
+                        <td><textarea class="perolehan-comment" data-course="${code}" data-idx="${idx}" style="width:100%; height:60px;" ${lockAttrs}>${row.comment || ''}</textarea></td>
+                        <td><input type="text" class="perolehan-proof" data-course="${code}" data-idx="${idx}" value="${row.proof || ''}" style="width:100%;" placeholder="${dict.rplRecognitionEvidencePlaceholder}" ${lockAttrs}></td>
+                        <td>
+                            <select class="assessment-select perolehan-status" data-course="${code}" data-idx="${idx}" ${lockAttrs}>
+                                <option value="Not Assessed" ${statusValue === 'Not Assessed' ? 'selected' : ''}>${dict.rplRecognitionStatusNone}</option>
+                                <option value="Achieved (Excellent)" ${statusValue === 'Achieved (Excellent)' ? 'selected' : ''}>${dict.rplRecognitionStatusExcellent}</option>
+                                <option value="Achieved (Good)" ${statusValue === 'Achieved (Good)' ? 'selected' : ''}>${dict.rplRecognitionStatusGood}</option>
+                                <option value="Sufficient" ${statusValue === 'Sufficient' ? 'selected' : ''}>${dict.rplRecognitionStatusSufficient}</option>
+                                <option value="Need More Evidence" ${statusValue === 'Need More Evidence' ? 'selected' : ''}>${dict.rplRecognitionStatusEvidence}</option>
+                                <option value="Not Achieved" ${statusValue === 'Not Achieved' ? 'selected' : ''}>${dict.rplRecognitionStatusNotAchieved}</option>
+                            </select>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            html += '</tbody></table>';
+            return html;
+        }
+
+        function renderPerolehanPrint(rows) {
+            const printArea = document.getElementById('perolehan-print-area');
+            if(!printArea) return;
+
+            const stdId = document.getElementById('selectStudentAssess').value;
+            if(!stdId) return;
+
+            const student = studentDatabase[stdId];
+            const assessorName = document.getElementById('selectAssessor')?.value || '-';
+            const graduationYear = student.tahunLulus || '-';
+            let html = `
+                <div style="margin-bottom:16px;">
+                    <div class="print-header" style="display:flex; align-items:flex-start; justify-content:space-between; gap:10px;">
+                        <div style="min-width:120px; text-align:left; font-size:10px; line-height:1.2;">
+                            Form SPMI-PS-TM-02
+                        </div>
+                        <div style="flex:1; text-align:center;">
+                            <h2 style="margin:0; font-weight:700;">SEKOLAH TINGGI TEKNOLOGI PEKANBARU</h2>
+                            <div style="font-weight:600; margin:2px 0 0;">Yayasan Dwi Sejahtera Pekanbaru</div>
+                            <h3 style="margin:2px 0 0;">Program Studi Teknik Mesin</h3>
+                            <p style="margin:2px 0 0; font-size:9px;">Jl. Dirgantara No.4 Marpoyan Damai, Pekanbaru 28125 – Riau | Telp: 0761-61815 | www.sttp-yds.ac.id</p>
+                            <hr style="border:1px solid #000; margin:6px 0 6px;">
+                            <h3 style="margin:6px 0 4px; white-space:nowrap; font-size:13px;">Hasil Rekapitulasi RPL Melalui Perolehan SKS</h3>
+                        </div>
+                        <div style="min-width:80px; display:flex; justify-content:flex-end; margin-right:0;">
+                            <img src="logo_STTP.png" alt="Logo STT Pekanbaru" style="height:100px; margin-top:-10px; margin-left:-6px;">
+                        </div>
+                    </div>
+                    <div style="margin:6px 0 10px 20px; font-size:10.5px; line-height:1.2; display:grid; grid-template-columns:repeat(3, 1fr); grid-template-rows:repeat(3, auto); grid-auto-flow:row; gap:6px 24px;">
+                        <div><strong>Nama Mahasiswa:</strong> ${student.name || '-'}</div>
+                        <div><strong>Jenjang Pendidikan Mula:</strong> ${student.asal || '-'}</div>
+                        <div><strong>Pekerjaan Saat Ini:</strong> ${student.pekerjaan || '-'}</div>
+                        <div><strong>Tempat/Tanggal Lahir:</strong> ${student.tempatTanggalLahir || '-'}</div>
+                        <div><strong>NIM/NPM Asal:</strong> ${student.nimAsal || '-'}</div>
+                        <div><strong>Lama Pengalaman Kerja:</strong> ${student.pengalamanKerja || '-'}</div>
+                        <div><strong>NIM:</strong> ${student.id || '-'}</div>
+                        <div><strong>Tahun Lulus:</strong> ${graduationYear}</div>
+                        <div></div>
+                    </div>
+                </div>
+            `;
+
+            let totalPerolehanSKS = 0;
+            Object.keys(rows).forEach(code => {
+                const dataRows = applyRpsWeights(code, rows[code]);
+                const sksValue = parseInt(courseDatabase[code]?.sks || 0);
+                const saved = assessmentDatabase[`${stdId}_${code}`] || {};
+                const overallStatus = saved.status || getOverallPerolehanStatus(dataRows);
+                const normalizedStatus = normalizePerolehanStatus(overallStatus);
+                const overallGrade = saved.grade || mapPerolehanStatusToGrade(overallStatus);
+                const displayGrade = overallGrade === 'Belum Mengambil' ? '-' : overallGrade;
+                if (displayGrade !== '-') {
+                    totalPerolehanSKS += sksValue;
+                }
+                html += `
+                    <div style="margin-bottom:16px;">
+                        <div style="margin-bottom:8px; font-weight:bold; color:#555;">Course: ${getCourseDisplayName(code)}</div>
+                        <table class="final-report-table">
+                            <thead>
+                                <tr>
+                                    <th style="width:5%;">No</th>
+                                    <th style="width:30%;">Sub-CPMK (Summary)</th>
+                                    <th style="width:8%;">Weight</th>
+                                    <th style="width:18%;">Assessor Comments</th>
+                                    <th style="width:18%;">Evidence</th>
+                                    <th style="width:13%;">Assessment Status</th>
+                                    <th style="width:8%;">Grade</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                `;
+
+                dataRows.forEach((row, idx) => {
+                    const gradeCell = idx === 0
+                        ? `<td rowspan="${dataRows.length}" style="text-align:center; font-weight:bold;">${displayGrade}</td>`
+                        : '';
+                    const weight = row.weight !== undefined ? row.weight : 0;
+                    html += `
+                        <tr>
+                            <td>${row.no}</td>
+                            <td>${row.cpmk}</td>
+                            <td style="text-align:center; font-weight:bold;">${weight}%</td>
+                            <td>${row.comment || '-'}</td>
+                            <td>${row.proof || '-'}</td>
+                            <td>${normalizePerolehanStatus(row.status || 'Not Assessed')}</td>
+                            ${gradeCell}
+                        </tr>
+                    `;
+                });
+
+                html += `</tbody></table></div>`;
+            });
+
+            html += `
+                <div style="margin-top:8px; text-align:right; font-weight:bold;">Total Credit Recognition: ${totalPerolehanSKS}</div>
+                <div style="margin-top:12px; font-style:italic; font-size:12px;">Assessment evidence must be attached.</div>
+                <div style="margin-top:16px; border-top: 1px solid black; padding-top:8px;">
+                    <div style="display:flex; justify-content:space-between; margin-top:12px; padding:0 20px;">
+                        <div style="text-align:center;">
+                            <p>RPL Assessor</p>
+                            <br><br>
+                            <p>(${assessorName})</p>
+                        </div>
+                        <div style="text-align:center;">
+                            <p>Pekanbaru, ${new Date().toLocaleDateString('id-ID')}</p>
+                            <p>Head of Mechanical Engineering Program</p>
+                            <br><br>
+                            <p>(Abdulkhair Junaidi, ST. MEng)</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            printArea.innerHTML = html;
+        }
+
+        function collectPerolehanRows() {
+            const grouped = {};
+            const cpmkEls = document.querySelectorAll('.perolehan-cpmk');
+            cpmkEls.forEach(el => {
+                const idx = parseInt(el.dataset.idx, 10);
+                const code = el.dataset.course;
+                if(!grouped[code]) grouped[code] = [];
+                const commentEl = document.querySelector(`.perolehan-comment[data-course="${code}"][data-idx="${idx}"]`);
+                const proofEl = document.querySelector(`.perolehan-proof[data-course="${code}"][data-idx="${idx}"]`);
+                const statusEl = document.querySelector(`.perolehan-status[data-course="${code}"][data-idx="${idx}"]`);
+                const weightText = document.querySelector(`table[data-course="${code}"] tbody tr:nth-child(${idx + 1}) td:nth-child(3)`)?.textContent || '';
+                const weight = parseFloat(weightText.replace('%', '')) || 0;
+                grouped[code].push({
+                    no: idx + 1,
+                    cpmk: el.value.trim(),
+                    weight,
+                    comment: commentEl ? commentEl.value.trim() : '',
+                    proof: proofEl ? proofEl.value.trim() : '',
+                    status: statusEl ? statusEl.value : 'Not Assessed'
+                });
+            });
+            return grouped;
+        }
+
+        function normalizePerolehanStatus(status = '') {
+            const map = {
+                'Belum Dinilai': 'Not Assessed',
+                'Terpenuhi (Sangat Baik)': 'Achieved (Excellent)',
+                'Terpenuhi (Baik)': 'Achieved (Good)',
+                'Cukup': 'Sufficient',
+                'Perlu Bukti Tambahan': 'Need More Evidence',
+                'Tidak Terpenuhi': 'Not Achieved'
+            };
+            return map[status] || status || 'Not Assessed';
+        }
+
+        function localizePerolehanStatus(status = '', lang = 'id') {
+            const reverseMap = {
+                'Not Assessed': 'Belum Dinilai',
+                'Achieved (Excellent)': 'Terpenuhi (Sangat Baik)',
+                'Achieved (Good)': 'Terpenuhi (Baik)',
+                'Sufficient': 'Cukup',
+                'Need More Evidence': 'Perlu Bukti Tambahan',
+                'Not Achieved': 'Tidak Terpenuhi'
+            };
+            if (lang === 'en') return normalizePerolehanStatus(status);
+            return reverseMap[status] || status || 'Belum Dinilai';
+        }
+
+        function mapPerolehanStatusToGrade(status) {
+            const normalized = normalizePerolehanStatus(status);
+            if (normalized === 'Achieved (Excellent)') return 'A';
+            if (normalized === 'Achieved (Good)') return 'B';
+            if (normalized === 'Sufficient') return 'C';
+            if (normalized === 'Need More Evidence') return 'Belum Mengambil';
+            if (normalized === 'Not Achieved') return 'Belum Mengambil';
+            return 'E';
+        }
+
+        function getOverallPerolehanStatus(rows) {
+            const total = rows.length;
+            const passed = rows.filter(r => normalizePerolehanStatus(r.status).includes('Achieved')).length;
+            const cukup = rows.filter(r => normalizePerolehanStatus(r.status) === 'Sufficient').length;
+            if (total === 0) return 'Not Assessed';
+            if (passed === total) return 'Achieved (Excellent)';
+            if (cukup >= 2) return 'Sufficient';
+            if (passed + cukup === total && passed > 0) return 'Achieved (Good)';
+            if (passed > total / 2 || cukup > total / 2) return 'Achieved (Good)';
+            if (passed > 0 || cukup > 0) return 'Need More Evidence';
+            return 'Not Achieved';
+        }
+
+        function savePerolehanCourse(code) {
+            const stdId = document.getElementById('selectStudentAssess').value;
+            if(!stdId) { alert("Pilih mahasiswa dulu!"); return; }
+            if(!code) { alert("Pilih mata kuliah dulu!"); return; }
+
+            const grouped = collectPerolehanRows();
+            let rows = grouped[code] || [];
+            if(rows.length === 0) { alert("Belum ada penilaian."); return; }
+
+            rows = applyRpsWeights(code, rows);
+            const status = getOverallPerolehanStatus(rows);
+            const key = `${stdId}_${code}`;
+            assessmentDatabase[key] = {
+                type: 'perolehan',
+                status: status,
+                grade: mapPerolehanStatusToGrade(status),
+                summaryRows: rows,
+                assessor: document.getElementById('selectAssessor').value
+            };
+
+            loadPerolehanTables();
+            renderPerolehanPrint(collectPerolehanRows());
+        }
+
+        function editPerolehanCourse(code) {
+            const stdId = document.getElementById('selectStudentAssess').value;
+            if(!stdId || !code) return;
+            const draftKey = `${stdId}_${code}`;
+            const sectionId = perolehanDrafts[draftKey];
+            const section = document.getElementById(sectionId);
+            if(!section) return;
+
+            section.dataset.locked = 'false';
+            let rows = (assessmentDatabase[draftKey] && assessmentDatabase[draftKey].summaryRows) ? assessmentDatabase[draftKey].summaryRows : buildCpmkSummary(scheduleData);
+            rows = applyRpsWeights(code, rows);
+            section.innerHTML = renderPerolehanTable(rows, code, false);
+        }
+
+        function deletePerolehanCourse(code) {
+            const stdId = document.getElementById('selectStudentAssess').value;
+            if(!stdId || !code) return;
+            const key = `${stdId}_${code}`;
+            if(assessmentDatabase[key] && assessmentDatabase[key].type === 'perolehan') {
+                delete assessmentDatabase[key];
+            }
+            const sectionId = perolehanDrafts[key];
+            if(sectionId && document.getElementById(sectionId)) {
+                document.getElementById(sectionId).remove();
+                delete perolehanDrafts[key];
+            }
+            renderPerolehanPrint(collectPerolehanRows());
+        }
+
+        function updatePerolehanTotal() {
+            const stdId = document.getElementById('selectStudentAssess').value;
+            const totalEl = document.getElementById('perolehan-total-sks');
+            if(!totalEl || !stdId) return;
+            let total = 0;
+            Object.keys(assessmentDatabase).forEach(key => {
+                if(key.startsWith(stdId + '_') && assessmentDatabase[key].type === 'perolehan') {
+                    const code = key.split('_')[1];
+                    const grade = assessmentDatabase[key].grade;
+                    if(grade && grade !== 'Belum Mengambil') {
+                        total += parseInt(courseDatabase[code]?.sks || 0);
+                    }
+                }
+            });
+            totalEl.textContent = `Total SKS Perolehan: ${total}`;
+        }
+
+        function saveAssessment() {
+            const stdId = document.getElementById('selectStudentAssess').value;
+            if(!stdId) { alert("Pilih mahasiswa dulu!"); return; }
+
+            const grouped = collectPerolehanRows();
+            const codes = Object.keys(grouped);
+            if(codes.length === 0) { alert("Belum ada penilaian yang diisi."); return; }
+
+            codes.forEach(code => {
+                let rows = grouped[code];
+                rows = applyRpsWeights(code, rows);
+                const status = getOverallPerolehanStatus(rows);
+                const key = `${stdId}_${code}`;
+                assessmentDatabase[key] = {
+                    type: 'perolehan',
+                    status: status,
+                    grade: mapPerolehanStatusToGrade(status),
+                    summaryRows: rows,
+                    assessor: document.getElementById('selectAssessor').value
+                };
+            });
+
+            renderPerolehanPrint(grouped);
+            loadPerolehanTables();
+            updatePerolehanTotal();
+            alert("Semua penilaian Perolehan SKS berhasil disimpan!");
+        }
+
+        function loadAssessmentFile() {
+            const fileInput = document.getElementById('openAssessmentFile');
+            const statusEl = document.getElementById('open-status');
+            if(!fileInput || !fileInput.files || !fileInput.files[0]) {
+                if(statusEl) statusEl.textContent = 'Pilih file CSV/JSON terlebih dahulu.';
+                return;
+            }
+
+            const file = fileInput.files[0];
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                try {
+                    const fileText = event.target.result;
+                    const isJson = file.name.toLowerCase().endsWith('.json');
+                    const parsed = isJson ? parseAssessmentJSON(fileText) : parseAssessmentCSV(fileText);
+                    if(!parsed || !parsed.selectedStudentId) throw new Error('Format file tidak valid atau data kosong.');
+
+                    assessmentDatabase = parsed.assessmentDatabase || {};
+
+                    if(parsed.student) {
+                        studentDatabase[parsed.selectedStudentId] = parsed.student;
+                    }
+
+                    populateStudentSelects();
+                    const selectStudent = document.getElementById('selectStudentAssess');
+                    if(parsed.selectedStudentId && studentDatabase[parsed.selectedStudentId]) {
+                        selectStudent.value = parsed.selectedStudentId;
+                    }
+
+                    if(statusEl) statusEl.textContent = `Berhasil memuat file: ${file.name}`;
+
+                    loadedCourseCode = null;
+                    perolehanDrafts = {};
+                    handleStudentChange();
+                    loadPerolehanTables();
+                    renderPerolehanPrint(collectPerolehanRows());
+                    renderConclusion();
+                } catch (error) {
+                    if(statusEl) statusEl.textContent = `Gagal memuat file: ${error.message}`;
+                }
+            };
+
+            reader.readAsText(file);
+        }
+
+        function parseCsvLine(line) {
+            const result = [];
+            let current = '';
+            let inQuotes = false;
+            for (let i = 0; i < line.length; i++) {
+                const char = line[i];
+                const next = line[i + 1];
+                if (char === '"') {
+                    if (inQuotes && next === '"') {
+                        current += '"';
+                        i++;
+                    } else {
+                        inQuotes = !inQuotes;
+                    }
+                } else if (char === ',' && !inQuotes) {
+                    result.push(current);
+                    current = '';
+                } else {
+                    current += char;
+                }
+            }
+            result.push(current);
+            return result.map(col => col.trim());
+        }
+
+        function parseAssessmentCSV(csvText) {
+            const lines = csvText.split(/\r?\n/).map(line => line.trim()).filter(Boolean);
+            let student = null;
+            let selectedStudentId = '';
+            const assessmentDatabaseParsed = {};
+
+            lines.forEach(line => {
+                const cols = parseCsvLine(line);
+                const type = cols[0];
+
+                if(type === 'student') {
+                    selectedStudentId = cols[1] || '';
+                    student = {
+                        id: cols[1] || '',
+                        name: cols[2] || '',
+                        asal: cols[3] || '',
+                        transcript: []
+                    };
+                }
+
+                if(type === 'transfer') {
+                    const stdId = cols[1];
+                    const mkCode = cols[2];
+                    const mkAsal = cols[3];
+                    const sksAsal = cols[4];
+                    const nilaiAsal = cols[5];
+                    const nilaiTujuan = cols[6];
+                    const key = `${stdId}_${mkCode}`;
+                    assessmentDatabaseParsed[key] = {
+                        type: 'transfer',
+                        origin_mk: mkAsal,
+                        origin_sks: sksAsal,
+                        origin_grade: nilaiAsal,
+                        target_grade: nilaiTujuan,
+                        status: `Transfer Nilai (${nilaiTujuan})`,
+                        comment: `Asal: ${mkAsal} (${nilaiAsal})`
+                    };
+                }
+
+                if(type === 'perolehan') {
+                    const stdId = cols[1];
+                    const mkCode = cols[2];
+                    const overallStatus = cols[3];
+                    const overallGrade = cols[4];
+                    const summaryJson = cols[5] || '[]';
+                    let summaryRows = [];
+                    try {
+                        summaryRows = JSON.parse(summaryJson || '[]');
+                    } catch (e) {
+                        summaryRows = [];
+                    }
+                    const key = `${stdId}_${mkCode}`;
+                    assessmentDatabaseParsed[key] = {
+                        type: 'perolehan',
+                        status: overallStatus,
+                        grade: overallGrade,
+                        summaryRows: summaryRows,
+                        assessor: document.getElementById('selectAssessor')?.value || ''
+                    };
+                }
+            });
+
+            return {
+                selectedStudentId,
+                student,
+                assessmentDatabase: assessmentDatabaseParsed
+            };
+        }
+
+        function parseAssessmentJSON(jsonText) {
+            const parsed = JSON.parse(jsonText || '{}');
+            if(!parsed || !parsed.student) return null;
+            return {
+                selectedStudentId: parsed.student.id || '',
+                student: parsed.student,
+                assessmentDatabase: parsed.assessmentDatabase || {}
+            };
+        }
+
+        function csvEscape(value) {
+            const safe = String(value ?? '').replace(/"/g, '""');
+            return `"${safe}"`;
+        }
+
+        function saveAssessmentFile() {
+            alert('Fitur Simpan CSV telah dipindahkan ke menu Open Penilaian.');
+        }
+
+        function saveAssessmentJSON() {
+            const stdId = document.getElementById('selectStudentAssess').value;
+            if(!stdId || !studentDatabase[stdId]) {
+                alert('Pilih mahasiswa terlebih dahulu.');
+                return;
+            }
+
+            const grouped = collectPerolehanRows();
+            const codes = Object.keys(grouped);
+            if(codes.length) {
+                codes.forEach(code => {
+                    const rows = grouped[code];
+                    const status = getOverallPerolehanStatus(rows);
+                    const key = `${stdId}_${code}`;
+                    assessmentDatabase[key] = {
+                        type: 'perolehan',
+                        status: status,
+                        grade: mapPerolehanStatusToGrade(status),
+                        summaryRows: rows,
+                        assessor: document.getElementById('selectAssessor').value
+                    };
+                });
+            }
+
+            const payload = {
+                student: studentDatabase[stdId],
+                assessmentDatabase: {}
+            };
+
+            Object.keys(assessmentDatabase).forEach(key => {
+                if(key.startsWith(stdId + '_')) {
+                    payload.assessmentDatabase[key] = assessmentDatabase[key];
+                }
+            });
+
+            const jsonContent = JSON.stringify(payload, null, 2);
+            const blob = new Blob([jsonContent], { type: 'application/json;charset=utf-8;' });
+            const fileName = `${studentDatabase[stdId].name.replace(/\s+/g, '_')}_penilaian.json`;
+
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = fileName;
+            link.click();
+        }
+
+        function getPanduanStorage() {
+            const raw = localStorage.getItem('panduanRPLFiles');
+            if(!raw) return [];
+            try {
+                const parsed = JSON.parse(raw);
+                return Array.isArray(parsed) ? parsed : [];
+            } catch (e) {
+                return [];
+            }
+        }
+
+        function setPanduanStorage(list) {
+            localStorage.setItem('panduanRPLFiles', JSON.stringify(list || []));
+        }
+
+        function loadPanduanPDF() {
+            const fileInput = document.getElementById('panduanFile');
+            const statusEl = document.getElementById('panduan-status');
+            if(!fileInput || !fileInput.files || !fileInput.files[0]) {
+                if(statusEl) statusEl.textContent = 'Pilih file PDF terlebih dahulu.';
+                return;
+            }
+            const file = fileInput.files[0];
+            const url = URL.createObjectURL(file);
+            const iframe = document.getElementById('panduan-preview');
+            if(iframe) iframe.src = url;
+            if(statusEl) statusEl.textContent = `Panduan dimuat: ${file.name}`;
+        }
+
+        function savePanduanPDF() {
+            const fileInput = document.getElementById('panduanFile');
+            const statusEl = document.getElementById('panduan-status');
+            if(!fileInput || !fileInput.files || !fileInput.files[0]) {
+                if(statusEl) statusEl.textContent = 'Pilih file PDF terlebih dahulu untuk disimpan.';
+                return;
+            }
+            const file = fileInput.files[0];
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                try {
+                    const base64 = event.target.result;
+                    const list = getPanduanStorage();
+                    const existingIndex = list.findIndex(item => item.name === file.name);
+                    const entry = {
+                        name: file.name,
+                        data: base64,
+                        savedAt: new Date().toISOString()
+                    };
+                    if(existingIndex >= 0) {
+                        list[existingIndex] = entry;
+                    } else {
+                        list.push(entry);
+                    }
+                    setPanduanStorage(list);
+                    if(statusEl) statusEl.textContent = `Panduan tersimpan: ${file.name}`;
+                    renderPanduanFromStorage();
+                    openSavedPanduan(file.name);
+                } catch (error) {
+                    if(statusEl) statusEl.textContent = `Gagal menyimpan panduan: ${error.message}`;
+                }
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function clearPanduanPDF() {
+            const iframe = document.getElementById('panduan-preview');
+            const statusEl = document.getElementById('panduan-status');
+            localStorage.removeItem('panduanRPLFiles');
+            if(iframe) iframe.removeAttribute('src');
+            if(statusEl) statusEl.textContent = 'Panduan dihapus. Silakan unggah ulang jika diperlukan.';
+            renderPanduanFromStorage();
+        }
+
+        function openSavedPanduan(name = '') {
+            const iframe = document.getElementById('panduan-preview');
+            const statusEl = document.getElementById('panduan-status');
+            const list = getPanduanStorage();
+            const entry = name ? list.find(item => item.name === name) : list[0];
+            if(entry && entry.data) {
+                if(iframe) iframe.src = entry.data;
+                if(statusEl) statusEl.textContent = `Panduan dimuat: ${entry.name}`;
+            } else if(statusEl) {
+                statusEl.textContent = 'Belum ada panduan yang tersimpan.';
+            }
+        }
+
+        function renderPanduanFromStorage() {
+            const iframe = document.getElementById('panduan-preview');
+            const statusEl = document.getElementById('panduan-status');
+            const listEl = document.getElementById('panduan-list');
+            const list = getPanduanStorage();
+
+            if(listEl) {
+                listEl.innerHTML = '';
+                list.forEach(item => {
+                    const btn = document.createElement('button');
+                    btn.className = 'btn btn-info';
+                    btn.style.padding = '6px 10px';
+                    btn.style.textTransform = 'none';
+                    btn.textContent = item.name;
+                    btn.onclick = () => openSavedPanduan(item.name);
+                    listEl.appendChild(btn);
+                });
+            }
+
+            if(list.length) {
+                if(statusEl) statusEl.textContent = `Panduan tersimpan: ${list.length} file.`;
+                if(iframe && !iframe.src) {
+                    openSavedPanduan(list[0].name);
+                }
+            } else {
+                if(iframe) iframe.removeAttribute('src');
+                if(statusEl) statusEl.textContent = 'Belum ada panduan yang tersimpan.';
+            }
+        }
+
+        function clearAssessmentEditor() {
+            const container = document.getElementById('perolehan-table-container');
+            container.innerHTML = '';
+            loadedCourseCode = null;
+            const selectMK = document.getElementById('selectMKAsesmen');
+            if(selectMK) selectMK.value = '';
+        }
+
+        // Helper to generate Target Course Options
+        function getCourseOptions(selectedCode = "") {
+            let options = '<option value="">-- Pilih MK Setara --</option>';
+            
+            const stdId = document.getElementById('selectStudentAssess').value;
+            const usedCodes = [];
+            if(stdId) {
+                for(let key in assessmentDatabase) {
+                    if(key.startsWith(stdId + '_') && assessmentDatabase[key].type === 'transfer') {
+                        const code = key.split('_')[1];
+                        if(code !== selectedCode) usedCodes.push(code);
+                    }
+                }
+            }
+
+            for (let code in courseDatabase) {
+                if(usedCodes.includes(code)) continue;
+
+                const selected = (code === selectedCode) ? "selected" : "";
+                options += `<option value="${code}" ${selected}>(${code}) ${courseDatabase[code].name}</option>`;
+            }
+            return options;
+        }
+
+        // Helper to generate Grade Options
+        function getGradeOptions(selectedGrade = "") {
+            const grades = ['A', 'B', 'C', 'D', 'E'];
+            let options = '<option value="">Nilai</option>';
+            grades.forEach(g => {
+                const selected = (g === selectedGrade) ? "selected" : "";
+                options += `<option value="${g}" ${selected}>${g}</option>`;
+            });
+            return options;
+        }
+        
+        // Helper to generate SKS Options
+        function getSKSOptions(selectedSKS = "") {
+             const sksList = ['1', '2', '3', '4'];
+             let options = '<option value="">SKS</option>';
+             sksList.forEach(s => {
+                 const selected = (s === selectedSKS) ? "selected" : "";
+                 options += `<option value="${s}" ${selected}>${s}</option>`;
+             });
+             return options;
+        }
+
+        function loadTransferView() {
+            const stdId = document.getElementById('selectStudentAssess').value;
+            const container = document.getElementById('transfer-view');
+            
+            if (!stdId) { 
+                container.innerHTML = '<p style="text-align:center; padding:20px; color:#666;">Silakan pilih mahasiswa pada toolbar di atas.</p>'; 
+                return; 
+            }
+
+            let html = `
+                <div style="margin-bottom:15px;">
+                    <h4>Credit Transfer Input</h4>
+                    <p style="font-size:12px; color:#666;">Enter the source course manually, then select the equivalent course and recognized grade.</p>
+                </div>
+                <div style="overflow-x:auto;">
+                    <table id="transfer-table" style="width:90%; max-width:1100px; min-width:760px; margin:0 auto;">
+                        <thead>
+                            <tr style="background:#eee;">
+                                <th style="width:45%;">Source Course (Type)</th>
+                                <th style="width:4%; text-align:center;">Credits</th>
+                                <th style="width:5%; text-align:center;">Grade</th>
+                                <th style="width:4%; text-align:center;">➡</th>
+                                <th style="width:23%;">Equivalent Course (Target)</th>
+                                <th style="width:6%; text-align:center;">Recognized Grade</th>
+                                <th style="width:5%;">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="transfer-rows-body">
+                            <!-- Rows injected here -->
+                        </tbody>
+                    </table>
+                </div>
+                <button class="btn btn-primary" style="margin-top:10px;" onclick="addTransferRow()">+ Add Row</button>
+            `;
+            
+            container.innerHTML = html;
+
+            let hasData = false;
+            for(let key in assessmentDatabase) {
+                if(key.startsWith(stdId + '_') && assessmentDatabase[key].type === 'transfer') {
+                    const data = assessmentDatabase[key];
+                    const code = key.split('_')[1];
+                    addTransferRow({
+                        mk_asal: data.origin_mk || "",
+                        sks_asal: data.origin_sks || "",
+                        nilai_asal: data.origin_grade || "",
+                        mk_tujuan: code,
+                        nilai_tujuan: data.target_grade || ""
+                    });
+                    hasData = true;
+                }
+            }
+
+            if(!hasData) {
+                addTransferRow();
+            }
+        }
+
+        function addTransferRow(data = null) {
+            const tbody = document.getElementById('transfer-rows-body');
+            const tr = document.createElement('tr');
+            tr.setAttribute('data-locked', 'false');
+            
+            const mkAsal = data ? data.mk_asal : "";
+            const sksAsal = data ? data.sks_asal : "";
+            const nilaiAsal = data ? data.nilai_asal : "";
+            const mkTujuan = data ? data.mk_tujuan : "";
+            const nilaiTujuan = data ? data.nilai_tujuan : "";
+
+            const isLocked = !!data; 
+
+            tr.innerHTML = `
+                <td><input type="text" class="input-mk-asal" value="${mkAsal}" placeholder="Source Course" style="width:100%;" ${isLocked ? 'disabled style="background:#f0f0f0;"' : ''}></td>
+                <td><select class="select-sks-asal" style="width:70px;" ${isLocked ? 'disabled style="background:#f0f0f0;"' : ''}>${getSKSOptions(sksAsal)}</select></td>
+                <td><select class="select-nilai-asal" style="width:90px;" ${isLocked ? 'disabled style="background:#f0f0f0;"' : ''}>${getGradeOptions(nilaiAsal)}</select></td>
+                <td style="text-align:center; vertical-align:middle; font-weight:bold; color:var(--primary-color);">➡</td>
+                <td><select class="select-mk-tujuan" style="width:100%;" ${isLocked ? 'disabled style="background:#f0f0f0;"' : ''}>${getCourseOptions(mkTujuan)}</select></td>
+                <td><select class="select-nilai-tujuan" style="width:90px;" ${isLocked ? 'disabled style="background:#f0f0f0;"' : ''}>${getGradeOptions(nilaiTujuan)}</select></td>
+                <td style="text-align:center; white-space: nowrap;">
+                    <button class="btn btn-row-action ${isLocked ? 'btn-warning' : 'btn-success'}" style="padding:4px 8px; margin-right:5px;" onclick="toggleTransferRow(this)">${isLocked ? '✏️ Edit' : '💾 Save'}</button>
+                    <button class="btn btn-danger" style="padding:4px 8px;" onclick="removeTransferRow(this)">🗑️</button>
+                </td>
+            `;
+            
+            if(isLocked) tr.setAttribute('data-locked', 'true');
+            
+            tbody.appendChild(tr);
+        }
+
+        function toggleTransferRow(btn) {
+            const row = btn.closest('tr');
+            const isLocked = row.getAttribute('data-locked') === 'true';
+            const inputs = row.querySelectorAll('input, select');
+            
+            if (isLocked) {
+                inputs.forEach(input => {
+                    input.disabled = false;
+                    input.style.background = 'white';
+                });
+                btn.innerHTML = '💾 Simpan';
+                btn.className = 'btn btn-row-action btn-success';
+                row.setAttribute('data-locked', 'false');
+            } else {
+                const mkTujuan = row.querySelector('.select-mk-tujuan').value;
+                if (!mkTujuan) {
+                    alert("Pilih Mata Kuliah Tujuan terlebih dahulu!");
+                    return;
+                }
+
+                inputs.forEach(input => {
+                    input.disabled = true;
+                    input.style.background = '#f0f0f0';
+                });
+                btn.innerHTML = '✏️ Edit';
+                btn.className = 'btn btn-row-action btn-warning';
+                row.setAttribute('data-locked', 'true');
+                
+                saveSingleTransferRow(row);
+            }
+        }
+        
+        function saveSingleTransferRow(row) {
+            const stdId = document.getElementById('selectStudentAssess').value;
+            if(!stdId) return;
+
+            const mkAsal = row.querySelector('.input-mk-asal').value;
+            const sksAsal = row.querySelector('.select-sks-asal').value;
+            const nilaiAsal = row.querySelector('.select-nilai-asal').value;
+            const mkTujuan = row.querySelector('.select-mk-tujuan').value;
+            const nilaiTujuan = row.querySelector('.select-nilai-tujuan').value;
+
+            if(mkTujuan) {
+                const key = `${stdId}_${mkTujuan}`;
+                assessmentDatabase[key] = {
+                    type: 'transfer',
+                    origin_mk: mkAsal,
+                    origin_sks: sksAsal,
+                    origin_grade: nilaiAsal,
+                    target_grade: nilaiTujuan,
+                    status: `Transfer Nilai (${nilaiTujuan})`, 
+                    comment: `Asal: ${mkAsal} (${nilaiAsal})`
+                };
+            }
+        }
+
+        function removeTransferRow(btn) {
+            const row = btn.closest('tr');
+            const isLocked = row.getAttribute('data-locked') === 'true';
+            if(isLocked) {
+                const mkTujuan = row.querySelector('.select-mk-tujuan').value;
+                const stdId = document.getElementById('selectStudentAssess').value;
+                if(stdId && mkTujuan) {
+                    const key = `${stdId}_${mkTujuan}`;
+                    if(assessmentDatabase[key] && assessmentDatabase[key].type === 'transfer') {
+                        delete assessmentDatabase[key];
+                    }
+                }
+            }
+            row.remove();
+        }
+
+        function saveTransfer() {
+            const stdId = document.getElementById('selectStudentAssess').value;
+            if(!stdId) { alert('Pilih mahasiswa dulu!'); return; }
+            
+            updateTransferTotal();
+            renderConclusion();
+            alert("Data Transfer tersimpan dan terupdate.");
+        }
+
+        function updateTransferTotal() {
+            const stdId = document.getElementById('selectStudentAssess').value;
+            const totalEl = document.getElementById('transfer-total-sks');
+            if(!totalEl || !stdId) return;
+            let total = 0;
+            Object.keys(assessmentDatabase).forEach(key => {
+                if(key.startsWith(stdId + '_') && assessmentDatabase[key].type === 'transfer') {
+                    const code = key.split('_')[1];
+                    total += parseInt(courseDatabase[code]?.sks || 0);
+                }
+            });
+            totalEl.textContent = `Total SKS Transfer: ${total}`;
+        }
+
+        function clearTransfer() {
+            const stdId = document.getElementById('selectStudentAssess').value;
+            if(!stdId) return;
+            for (let key in assessmentDatabase) {
+                if(key.startsWith(stdId) && assessmentDatabase[key].type === 'transfer') {
+                    delete assessmentDatabase[key];
+                }
+            }
+            loadTransferView();
+            renderConclusion();
+            alert("Data transfer direset.");
+        }
+
+        function renderTransferPrint() {
+            const printArea = document.getElementById('transfer-print-area');
+            if(!printArea) return;
+
+            const stdId = document.getElementById('selectStudentAssess').value;
+            if(!stdId) { printArea.innerHTML = ''; return; }
+
+            const student = studentDatabase[stdId];
+            const assessorName = document.getElementById('selectAssessor')?.value || '-';
+            const graduationYear = student.tahunLulus || '-';
+            const rows = [];
+
+            Object.keys(assessmentDatabase).forEach(key => {
+                if(key.startsWith(stdId + '_') && assessmentDatabase[key].type === 'transfer') {
+                    const data = assessmentDatabase[key];
+                    const code = key.split('_')[1];
+                    rows.push({
+                        targetCode: code,
+                        targetName: courseDatabase[code]?.name || '-',
+                        targetSKS: courseDatabase[code]?.sks || '-',
+                        originMk: data.origin_mk || '-',
+                        originSKS: data.origin_sks || '-',
+                        originGrade: data.origin_grade || '-',
+                        targetGrade: data.target_grade || '-'
+                    });
+                }
+            });
+
+            let html = `
+                <div style="margin-bottom:16px;">
+                    <div class="print-header" style="display:flex; align-items:flex-start; justify-content:space-between; gap:10px;">
+                        <div style="min-width:120px; text-align:left; font-size:10px; line-height:1.2;">Form SPMI-PS-TM-03</div>
+                        <div style="flex:1; text-align:center;">
+                            <h2 style="margin:0; font-weight:700;">SEKOLAH TINGGI TEKNOLOGI PEKANBARU</h2>
+                            <div style="font-weight:600; margin:2px 0 0;">Yayasan Dwi Sejahtera Pekanbaru</div>
+                            <h3 style="margin:2px 0 0;">Program Studi Teknik Mesin</h3>
+                            <p style="margin:2px 0 0; font-size:9px;">Jl. Dirgantara No.4 Marpoyan Damai, Pekanbaru 28125 – Riau | Telp: 0761-61815 | www.sttp-yds.ac.id</p>
+                            <hr style="border:1px solid #000; margin:6px 0 6px;">
+                            <h3 style="margin:6px 0 4px; white-space:nowrap; font-size:13px;">RPL Recapitulation via Credit Transfer</h3>
+                        </div>
+                        <div style="min-width:80px; display:flex; justify-content:flex-end; margin-right:0;">
+                            <img src="logo_STTP.png" alt="Logo STT Pekanbaru" style="height:100px; margin-top:-10px; margin-left:-6px;">
+                        </div>
+                    </div>
+                    <div style="margin:6px 0 10px 20px; font-size:10.5px; line-height:1.2; display:grid; grid-template-columns:repeat(3, 1fr); grid-template-rows:repeat(3, auto); grid-auto-flow:row; gap:6px 24px;">
+                        <div><strong>Student Name:</strong> ${student.name || '-'}</div>
+                        <div><strong>Prior Education Level:</strong> ${student.asal || '-'}</div>
+                        <div><strong>Current Job:</strong> ${student.pekerjaan || '-'}</div>
+                        <div><strong>Place/Date of Birth:</strong> ${student.tempatTanggalLahir || '-'}</div>
+                        <div><strong>Origin Student ID:</strong> ${student.nimAsal || '-'}</div>
+                        <div><strong>Work Experience Length:</strong> ${student.pengalamanKerja || '-'}</div>
+                        <div><strong>Student ID:</strong> ${student.id || '-'}</div>
+                        <div><strong>Graduation Year:</strong> ${graduationYear}</div>
+                        <div></div>
+                    </div>
+                </div>
+                <table class="final-report-table">
+                    <thead>
+                        <tr>
+                            <th style="width:5%;">No</th>
+                            <th style="width:25%;">Source Course</th>
+                            <th style="width:6%;">Credits</th>
+                            <th style="width:8%;">Grade</th>
+                            <th style="width:5%;">➡</th>
+                            <th style="width:25%;">Equivalent Course</th>
+                            <th style="width:6%;">Credits</th>
+                            <th style="width:8%;">Recognized Grade</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            if(!rows.length) {
+                html += `<tr><td colspan="8" style="text-align:center;">No transfer data available.</td></tr>`;
+            } else {
+                rows.forEach((row, idx) => {
+                    html += `
+                        <tr>
+                            <td>${idx + 1}</td>
+                            <td>${row.originMk}</td>
+                            <td style="text-align:center;">${row.originSKS}</td>
+                            <td style="text-align:center;">${row.originGrade}</td>
+                            <td style="text-align:center;">➡</td>
+                            <td>${row.targetCode} - ${row.targetName}</td>
+                            <td style="text-align:center;">${row.targetSKS}</td>
+                            <td style="text-align:center; font-weight:bold;">${row.targetGrade}</td>
+                        </tr>
+                    `;
+                });
+            }
+
+            const totalTransferSKS = rows.reduce((sum, row) => sum + (parseInt(row.targetSKS) || 0), 0);
+
+            html += `</tbody></table>
+                <div style="margin-top:8px; text-align:right; font-weight:bold;">Total Transfer Credits: ${totalTransferSKS}</div>
+                <div style="margin-top:16px; border-top: 1px solid black; padding-top:8px;">
+                    <div style="display:flex; justify-content:space-between; margin-top:12px; padding:0 20px;">
+                        <div style="text-align:center;">
+                            <p>RPL Assessor</p>
+                            <br><br>
+                            <p>(${assessorName})</p>
+                        </div>
+                        <div style="text-align:center;">
+                            <p>Pekanbaru, ${new Date().toLocaleDateString('id-ID')}</p>
+                            <p>Head of Mechanical Engineering Program</p>
+                            <br><br>
+                            <p>(Abdulkhair Junaidi, ST. MEng)</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            printArea.innerHTML = html;
+        }
+
+        function printTransferReport() {
+            renderTransferPrint();
+            window.print();
+        }
+
+        // 7. LOGICKA KONEKSI & SUB-TABS (Inside Assessment)
+        function switchSubTab(tabName) {
+            document.querySelectorAll('.sub-tab').forEach(el => el.classList.remove('active'));
+            document.getElementById(`tab-${tabName}`).classList.add('active');
+            
+            document.getElementById('view-transfer').style.display = 'none';
+            document.getElementById('view-perolehan').style.display = 'none';
+            document.getElementById('view-conclusion').style.display = 'none';
+            document.getElementById('view-open').style.display = 'none';
+            document.getElementById('view-panduan').style.display = 'none';
+
+            if(tabName === 'transfer') {
+                document.getElementById('view-transfer').style.display = 'block';
+                loadTransferView();
+                renderTransferPrint();
+                updateTransferTotal();
+            } else if (tabName === 'perolehan') {
+                document.getElementById('view-perolehan').style.display = 'block';
+
+                const selectMK = document.getElementById('selectMKAsesmen');
+                selectMK.innerHTML = '<option value="">-- Pilih MK --</option>';
+                const stdId = document.getElementById('selectStudentAssess').value;
+
+                const transferred = [];
+                if(stdId) {
+                    for(let key in assessmentDatabase) {
+                        if(key.startsWith(stdId + '_') && assessmentDatabase[key].type === 'transfer') {
+                            transferred.push(key.split('_')[1]);
+                        }
+                    }
+                }
+
+                for(let code in courseDatabase) {
+                    if(!transferred.includes(code)) {
+                        const opt = document.createElement('option');
+                        opt.value = code;
+                        opt.innerText = `${code} - ${getCourseDisplayName(code)}`;
+                        if(code === loadedCourseCode) opt.selected = true;
+                        selectMK.appendChild(opt);
+                    }
+                }
+
+                loadPerolehanTables();
+                renderPerolehanPrint(collectPerolehanRows());
+
+                if(!loadedCourseCode && !Object.keys(perolehanDrafts).length) {
+                    document.getElementById('perolehan-table-container').innerHTML =
+                        '<div style="text-align:center; padding:40px; color:#777;"><h4>Belum ada Mata Kuliah yang dipilih.</h4><p>Silakan pilih mata kuliah di atas untuk mulai menilai.</p></div>';
+                    document.getElementById('perolehan-print-area').innerHTML = '';
+                } else if (loadedCourseCode && transferred.includes(loadedCourseCode)) {
+                    document.getElementById('perolehan-table-container').innerHTML =
+                        '<div style="text-align:center; padding:40px; color:red;"><h4>Mata Kuliah Disetarakan.</h4><p>Mata kuliah ini sudah diambil via Transfer SKS.</p></div>';
+                    document.getElementById('perolehan-print-area').innerHTML = '';
+                    loadedCourseCode = null;
+                    selectMK.value = "";
+                } else if (loadedCourseCode) {
+                    loadPerolehanCourse(loadedCourseCode);
+                }
+            } else if (tabName === 'conclusion') {
+                document.getElementById('view-conclusion').style.display = 'block';
+                renderConclusion();
+            } else if (tabName === 'open') {
+                document.getElementById('view-open').style.display = 'block';
+            } else if (tabName === 'panduan') {
+                document.getElementById('view-panduan').style.display = 'block';
+                renderPanduanFromStorage();
+                setTimeout(() => openSavedPanduan(), 100);
+            }
+        }
+
+        // 8. FINAL REPORT (CONCLUSION)
+        function getLanguagePreference() {
+            const stored = localStorage.getItem('appLanguage');
+            return stored || 'en';
+        }
+
+        function initLanguage() {
+            const langModal = document.getElementById('language-modal');
+            const saved = localStorage.getItem('appLanguage');
+            const initial = saved || 'en';
+            if (langModal) {
+                langModal.classList.add('active');
+            }
+            if (!saved) {
+                document.body.classList.add('language-pending');
+                return;
+            }
+            setLanguage(initial, false);
+        }
+
+        function setLanguage(lang, fromModal = false) {
+            const chosen = lang || 'id';
+            localStorage.setItem('appLanguage', chosen);
+            const langSelect = document.getElementById('langSelect');
+            if (langSelect) langSelect.value = chosen;
+            const langModal = document.getElementById('language-modal');
+            if (langModal) langModal.classList.remove('active');
+            document.body.classList.remove('language-pending');
+            applyTranslations(chosen);
+        }
+
+        function t(key) {
+            const dict = translations[getLanguagePreference()] || translations.id;
+            return dict[key] || key;
+        }
+
+        function getCourseDisplayName(code, lang = getLanguagePreference()) {
+            const course = courseDatabase[code] || {};
+            if (lang === 'en') return course.name_en || course.name || '';
+            return course.name_id || course.name || '';
+        }
+
+        function refreshPerolehanCourseLabels() {
+            const lang = getLanguagePreference();
+            document.querySelectorAll('[data-course-label]').forEach(el => {
+                const code = el.getAttribute('data-course-label');
+                el.textContent = getCourseDisplayName(code, lang);
+            });
+        }
+
+        function refreshRplViews() {
+            if (!document.getElementById('assessment')?.classList.contains('active')) return;
+            const activeTab = document.querySelector('.sub-tab.active');
+            if (activeTab) {
+                const tabId = activeTab.id.replace('tab-', '');
+                switchSubTab(tabId);
+            } else {
+                switchSubTab('transfer');
+            }
+        }
+
+        function applyTranslations(lang) {
+            const dict = translations[lang] || translations.id;
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (dict[key]) el.innerHTML = dict[key];
+            });
+            document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+                const key = el.getAttribute('data-i18n-placeholder');
+                if (dict[key]) el.setAttribute('placeholder', dict[key]);
+            });
+            renderCourseList();
+            refreshRplViews();
+            refreshPerolehanCourseLabels();
+        }
+
+        function renderConclusion() {
+            const stdId = document.getElementById('selectStudentAssess').value;
+            const container = document.getElementById('conclusion-table-container');
+            const statsDiv = document.getElementById('conclusion-stats');
+            const printArea = document.querySelector('.print-area');
+
+            if (!stdId) {
+                container.innerHTML = '<p style="text-align:center; padding:20px; color:#666;">Silakan pilih mahasiswa pada toolbar di atas.</p>';
+                statsDiv.style.display = 'none';
+                return;
+            }
+
+            const student = studentDatabase[stdId];
+            const semesterOrder = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII'];
+            const grouped = {};
+            const lang = getLanguagePreference();
+            const dict = translations[lang] || translations.id;
+
+            semesterOrder.forEach(sem => grouped[sem] = []);
+            Object.keys(courseDatabase).forEach(code => {
+                const course = courseDatabase[code];
+                if (!grouped[course.semester]) grouped[course.semester] = [];
+                grouped[course.semester].push({ key: code, ...course });
+            });
+
+            let totalRecognizedSKS = 0;
+            let totalTransferSKS = 0;
+            let totalPerolehanSKS = 0;
+            const graduationYear = student.tahunLulus || '-';
+
+            let html = `<div style="margin-bottom:20px;">
+                <div class="print-header" style="display:flex; align-items:flex-start; justify-content:space-between; gap:10px; margin-top:-15px;">
+                    <div style="min-width:120px; text-align:left; font-size:10px; line-height:1.2;">
+                        Form SPMI-PS-TM-01
+                    </div>
+                    <div style="flex:1; text-align:center;">
+                        <h2 style="margin:0; font-weight:700;">SEKOLAH TINGGI TEKNOLOGI PEKANBARU</h2>
+                        <div style="font-weight:600; margin:2px 0 0;">Yayasan Dwi Sejahtera Pekanbaru</div>
+                        <h3 style="margin:2px 0 0;">${dict.printProgramTitle}</h3>
+                        <p style="margin:2px 0 0; font-size:9px;">${dict.printAddress}</p>
+                        <hr style="border:1px solid #000; margin:6px 0 6px;">
+                        <h3 style="margin:6px 0 4px; white-space:nowrap; font-size:13px;">${dict.printConclusionTitle}</h3>
+                    </div>
+                    <div style="min-width:80px; display:flex; justify-content:flex-end; margin-right:0;">
+                        <img src="logo_STTP.png" alt="Logo STT Pekanbaru" style="height:100px; margin-top:8px; margin-left:-6px;">
+                    </div>
+                </div>
+                <div style="margin:6px 0 10px 20px; font-size:10.5px; line-height:1.2; display:grid; grid-template-columns:repeat(3, 1fr); grid-template-rows:repeat(3, auto); grid-auto-flow:row; gap:6px 24px;">
+                    <div><strong>${dict.printStudentName}:</strong> ${student.name || '-'}</div>
+                    <div><strong>${dict.printPriorEducation}:</strong> ${student.asal || '-'}</div>
+                    <div><strong>${dict.printCurrentJob}:</strong> ${student.pekerjaan || '-'}</div>
+                    <div><strong>${dict.printBirthInfo}:</strong> ${student.tempatTanggalLahir || '-'}</div>
+                    <div><strong>${dict.printOriginId}:</strong> ${student.nimAsal || '-'}</div>
+                    <div><strong>${dict.printWorkExperience}:</strong> ${student.pengalamanKerja || '-'}</div>
+                    <div><strong>${dict.printStudentId}:</strong> ${student.id || '-'}</div>
+                    <div><strong>${dict.printGraduationYear}:</strong> ${graduationYear}</div>
+                    <div></div>
+                </div>
+                <table class="final-report-table">
+                    <thead>
+                        <tr>
+                            <th width="8%">${dict.conclusionColCode}</th>
+                            <th width="34%">${dict.conclusionColCourse}</th>
+                            <th width="6%">${dict.conclusionColCredits}</th>
+                            <th width="18%">${dict.conclusionColStatus}</th>
+                            <th width="8%">${dict.conclusionColGrade}</th>
+                            <th width="26%">${dict.conclusionColRemaining}</th>
+                        </tr>
+                    </thead>
+                    <tbody>`;
+
+            let rowCount = 0;
+            const breakpoints = [28, 59];
+
+            semesterOrder.forEach(sem => {
+                const courses = grouped[sem] || [];
+                if (!courses.length) return;
+
+                html += `<tr>
+                    <td colspan="6" style="background:#eee; font-weight:bold;">${dict.semesterLabel} ${sem}</td>
+                </tr>`;
+
+                courses.forEach(course => {
+                    const key = `${stdId}_${course.key}`;
+                    const data = assessmentDatabase[key];
+
+                    let status = dict.statusNotTaken;
+                    let gradeText = "-";
+                    let notes = getCourseDisplayName(course.key, lang) || course.name;
+
+                    if (data) {
+                        if (data.type === 'transfer') {
+                            status = dict.statusRecognizedTransfer;
+                            gradeText = data.target_grade || "?";
+                            notes = "-";
+                            totalRecognizedSKS += parseInt(course.sks);
+                            totalTransferSKS += parseInt(course.sks);
+                        } else if (data.type === 'perolehan') {
+                            if (data.grade === 'Belum Mengambil') {
+                                status = dict.statusNotTaken;
+                                gradeText = "-";
+                                notes = course.name;
+                            } else {
+                                const localizedStatus = localizePerolehanStatus(data.status || dict.statusRecognizedRecognition, lang);
+                                status = localizedStatus || dict.statusRecognizedRecognition;
+                                gradeText = data.grade || "-";
+                                notes = "-";
+                                totalRecognizedSKS += parseInt(course.sks);
+                                totalPerolehanSKS += parseInt(course.sks);
+                            }
+                        }
+                    }
+
+                    const shouldBreak = breakpoints.includes(rowCount + 1);
+                    const rowClass = shouldBreak ? ' class="page-break-before"' : '';
+
+                    html += `<tr${rowClass}>
+                        <td>${course.code}</td>
+                        <td><b>${course.name}</b></td>
+                        <td style="text-align:center;">${course.sks}</td>
+                        <td>${status}</td>
+                        <td style="text-align:center; font-weight:bold;">${gradeText}</td>
+                        <td>${notes}</td>
+                    </tr>`;
+                    rowCount += 1;
+                });
+            });
+
+            const totalCurriculumSKS = Object.values(courseDatabase).reduce((sum, item) => sum + parseInt(item.sks), 0);
+            const remainingSKS = totalCurriculumSKS - totalRecognizedSKS;
+
+            html += `</tbody></table>
+                <div class="conclusion-summary" style="margin-top:16px; border-top: 1px solid black; padding-top:6px;">
+                    <h3>${dict.conclusionSummaryTitle}</h3>
+                    <div style="display:flex; flex-wrap:wrap; gap:12px; font-size:12px;">
+                        <div><strong>${dict.conclusionSummaryCurriculum}:</strong> ${totalCurriculumSKS}</div>
+                        <div><strong>${dict.conclusionSummaryTransfer}:</strong> ${totalTransferSKS}</div>
+                        <div><strong>${dict.conclusionSummaryRecognition}:</strong> ${totalPerolehanSKS}</div>
+                        <div><strong>${dict.conclusionSummaryRecognized}:</strong> ${totalRecognizedSKS}</div>
+                        <div><strong>${dict.conclusionSummaryRemaining}:</strong> ${remainingSKS}</div>
+                    </div>
+                    <div style="margin-top:16px; font-weight:bold;">${dict.conclusionApprovedBy}</div>
+                    <div style="margin-top:8px;">${dict.conclusionDate}: ${new Date().toLocaleDateString('id-ID')}</div>
+                    <div style="display:flex; justify-content:space-between; margin-top:16px; padding:0 40px;">
+                        <div style="text-align:center;">
+                            <p>${dict.conclusionAssessor}</p>
+                            <br><br>
+                            <p>(${document.getElementById('selectAssessor').value})</p>
+                        </div>
+                        <div style="text-align:center;">
+                            <p>${dict.conclusionHead}</p>
+                            <br><br>
+                            <p>(Abdulkhair Junaidi, ST. MEng)</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="print-page-number"></div>
+            `;
+
+            container.innerHTML = html;
+            
+            document.getElementById('con-total-recognized').innerText = totalRecognizedSKS;
+            document.getElementById('con-total-transfer').innerText = totalTransferSKS;
+            document.getElementById('con-total-perolehan').innerText = totalPerolehanSKS;
+            document.getElementById('con-total-remaining').innerText = remainingSKS;
+
+            statsDiv.style.display = 'flex';
+        }
+
+        const translations = {
+            id: {
+                sidebarTitle: 'Sekolah Tinggi Teknologi Pekanbaru',
+                sidebarProgram: 'Teknik Mesin',
+                navCover: '🏠 Cover Dokumen',
+                navVision: '🎯 Visi, Misi & Tujuan',
+                navProfile: '👤 Profil Lulusan',
+                navCpl: '🎓 Capaian Pembelajaran',
+                navCourses: '📚 Daftar Mata Kuliah',
+                navRps: '⚙️ Generator RPS',
+                navRpl: '📝 Penilaian RPL',
+                coverTitle: 'Kurikulum Sesuai Standar IABEEE Tahun 2026',
+                coverYear: '',
+                coverSubtitle: 'PROGRAM SARJANA TEKNIK MESIN<br>SEKOLAH TINGGI TEKNOLOGI PEKANBARU',
+                coverDocTitle: 'KURIKULUM<br>DAN<br>SILABUS MATA KULIAH',
+                coverFooter: 'Jl. Dirgantara No.4 Marpoyan Damai, Pekanbaru 28125 – Riau<br>Telp: 0761-61815',
+                visionTitle: 'Visi, Misi, dan Tujuan',
+                visionLabel: 'Visi',
+                visionText: 'Menjadi program studi teknik mesin yang unggul dalam menghasilkan lulusan yang adaptif terhadap kebutuhan tenaga kerja dunia usaha, industri serta kewirausahaan di Provinsi Riau dan Regional Sijori pada tahun 2025.',
+                missionLabel: 'Misi',
+                mission1: 'Menyelenggarakan pendidikan di bidang Teknik Mesin yang melahirkan sarjana unggul dan adaptif terhadap kebutuhan tenaga kerja dunia usaha, industri dan kewirausahaan memilliki integritas kepribadian berlandaskan IPTEK dan IMTAQ.',
+                mission2: 'Melaksanakan penelitian untuk memajukan ilmu pengetahuan di bidang teknik dan berupaya memecahkan masalah bidang teknik mesin.',
+                mission3: 'Melaksanakan pengabdian kepada masyarakat sebagai bentuk pemanfaatan ilmu pengetahuan dan teknologi bidang teknik bagi kesejahteraan masyarakat.',
+                mission4: 'Menyediakan sarana dan prasarana yang baik dalam mendukung proses pembelajaran yang kondusif.',
+                mission5: 'Membangun kerjasama dengan berbagai instansi dalam maupun luar negeri yang relevan dengan bidang teknik khusunya teknik mesin.',
+                profileTitle: 'Profil Lulusan',
+                profileIntro: 'Berdasarkan uraian faktor-faktor yang memengaruhi profil lulusan, Program Studi S1 Teknik Mesin STT.Pekanbaru merumuskan profil lulusan sebagai berikut:',
+                profileCol1: 'Profil',
+                profileCol2: 'Deskripsi Singkat',
+                profileEngineer: 'Perekayasa',
+                profileEngineerDesc: 'Mampu memenuhi kebutuhan pasar tentang perekayasa.',
+                profileConsultant: 'Konsultan',
+                profileConsultantDesc: 'Mampu memenuhi kebutuhan pasar tentang konsultan.',
+                profileEnergy: 'Manajer Energi',
+                profileEnergyDesc: 'Mampu mengelola energi dan material.',
+                profileResearch: 'Asisten Peneliti',
+                profileResearchDesc: 'Mampu memenuhi tantangan perkembangan keilmuan.',
+                profileEntrepreneur: 'Entrepreneur',
+                profileEntrepreneurDesc: 'Mampu menciptakan lapangan pekerjaan.',
+                cplTitle: 'Capaian Pembelajaran Lulusan (CPL)',
+                cplIntro: 'CPL merujuk pada kualifikasi lulusan yang ingin dicapai meliputi Sikap, Pengetahuan Umum, Keterampilan Umum dan Keterampilan Khusus.',
+                cplColCode: 'Kode',
+                cplColAspect: 'Aspek',
+                cplColDesc: 'Capaian Pembelajaran Lulusan (CPL)',
+                cplAttitude: 'Sikap (Atittude)',
+                cplKnowledge: 'Pengetahuan Umum (General Knowledge)',
+                cplGeneralSkills: 'Keterampilan Umum (Soft Skills)',
+                cplSpecialSkills: 'Keterampilan Khusus (Special Skills)',
+                cplS1: 'Taat melaksanakan ibadah, bertaqwa dan menunjukkan integritas moral, tanggung jawab profesi, serta semangat kebangsaan dalam praktik keteknikan.',
+                cplP1: 'Menerapkan konsep matematika, sains dasar, dan prinsip rekayasa untuk memecahkan masalah teknik mesin yang kompleks.',
+                cplPU1: 'Berkomunikasi secara efektif, berpikir kritis, dan bekerja sama dalam tim lintas disiplin dengan menjunjung nilai kejujuran dan amanah.',
+                cplPK1: 'Merancang sistem mekanikal berbasis Kecerdasan Buatan (AI) untuk aplikasi industri MIGAS, Kelapa Sawit, dan Pulp & Kertas yang berkelanjutan.',
+                cplPK2: 'Menggunakan teknik, keterampilan, dan tools teknologi modern (CAD/CAM/CAE, Python/AI) dalam praktik keteknikan secara aman (K3).',
+                courseListTitle: 'Daftar Mata Kuliah',
+                courseListIntro: 'Berikut adalah daftar lengkap mata kuliah Program Studi Teknik Mesin STT.Pekanbaru.',
+                courseListSearch: '🔍 Cari Nama Mata Kuliah atau Kode...',
+                courseListTotal: 'Total Beban Studi: <span id="grand-total-sks">0</span> SKS',
+                rpsTitle: 'Generator Rencana Pembelajaran (RPS)',
+                rpsIntro: 'Halaman ini digunakan Dosen untuk Menyusun dan Mencetak Dokumen RPS Lengkap.',
+                rplTitle: 'Penilaian RPL (Rekognisi Pembelajaran Lampau)',
+                rplIntro: 'Hub utama untuk proses Asesmen, Transfer Kredit, dan Pelaporan Akhir.',
+                rplRecognitionCourseLabel: 'Mata Kuliah',
+                rplRecognitionColNo: 'No',
+                rplRecognitionColSubCpmk: 'Sub-CPMK (Ringkas)',
+                rplRecognitionColWeight: 'Bobot',
+                rplRecognitionColComment: 'Komentar Asesor',
+                rplRecognitionColEvidence: 'Bukti',
+                rplRecognitionColStatus: 'Status Penilaian',
+                rplRecognitionEvidencePlaceholder: 'Link/Nama Dokumen',
+                rplRecognitionStatusNone: 'Belum Dinilai',
+                rplRecognitionStatusExcellent: 'Terpenuhi (Sangat Baik)',
+                rplRecognitionStatusGood: 'Terpenuhi (Baik)',
+                rplRecognitionStatusSufficient: 'Cukup',
+                rplRecognitionStatusEvidence: 'Perlu Bukti Tambahan',
+                rplRecognitionStatusNotAchieved: 'Tidak Terpenuhi',
+                rplRecognitionSaveSingle: '💾 Simpan Penilaian',
+                rplRecognitionEdit: '✏️ Edit Penilaian',
+                rplRecognitionDelete: '🗑️ Hapus',
+                printProgramTitle: 'Program Studi Teknik Mesin',
+                printAddress: 'Jl. Dirgantara No.4 Marpoyan Damai, Pekanbaru 28125 – Riau | Telp: 0761-61815 | www.sttp-yds.ac.id',
+                printConclusionTitle: 'Lembar Rekapitulasi Rekognisi Pembelajaran Lampau (RPL)',
+                printStudentName: 'Nama Mahasiswa',
+                printPriorEducation: 'Jenjang Pendidikan Mula',
+                printCurrentJob: 'Pekerjaan Saat Ini',
+                printBirthInfo: 'Tempat/Tanggal Lahir',
+                printOriginId: 'NIM/NPM Asal',
+                printWorkExperience: 'Lama Pengalaman Kerja',
+                printStudentId: 'NIM',
+                printGraduationYear: 'Tahun Lulus',
+                conclusionColCode: 'Kode',
+                conclusionColCourse: 'Mata Kuliah',
+                conclusionColCredits: 'SKS',
+                conclusionColStatus: 'Status',
+                conclusionColGrade: 'Nilai',
+                conclusionColRemaining: 'MK Yang Diikuti',
+                semesterLabel: 'Semester',
+                statusNotTaken: 'Belum Mengambil',
+                statusRecognizedTransfer: 'Diakui (Transfer)',
+                statusRecognizedRecognition: 'Diakui (Perolehan)',
+                conclusionSummaryTitle: 'Ringkasan Akhir',
+                conclusionSummaryCurriculum: 'Total SKS Kurikulum',
+                conclusionSummaryTransfer: 'Total SKS Transfer',
+                conclusionSummaryRecognition: 'Total SKS Perolehan',
+                conclusionSummaryRecognized: 'Total SKS Diakui',
+                conclusionSummaryRemaining: 'Sisa SKS Harus Diambil',
+                conclusionApprovedBy: 'Disahkan oleh,',
+                conclusionDate: 'Tanggal',
+                conclusionAssessor: 'Asesor RPL',
+                conclusionHead: 'Ketua Program Studi Teknik Mesin\nSekolah Tinggi Teknologi Pekanbaru'
+            },
+            en: {
+                sidebarTitle: 'Sekolah Tinggi Teknologi Pekanbaru',
+                sidebarProgram: 'Mechanical Engineering',
+                navCover: '🏠 Document Cover',
+                navVision: '🎯 Vision, Mission & Goals',
+                navProfile: '👤 Graduate Profile',
+                navCpl: '🎓 Learning Outcomes',
+                navCourses: '📚 Course List',
+                navRps: '⚙️ RPS Generator',
+                navRpl: '📝 RPL Assessment',
+                coverTitle: 'IABEEE-Compliant Curriculum 2026',
+                coverYear: '',
+                coverSubtitle: 'UNDERGRADUATE PROGRAM IN MECHANICAL ENGINEERING<br>SEKOLAH TINGGI TEKNOLOGI PEKANBARU',
+                coverDocTitle: 'CURRICULUM<br>AND<br>COURSE SYLLABI',
+                coverFooter: 'Jl. Dirgantara No.4 Marpoyan Damai, Pekanbaru 28125 – Riau<br>Telp: 0761-61815',
+                visionTitle: 'Vision, Mission, and Goals',
+                visionLabel: 'Vision',
+                visionText: 'To become a leading mechanical engineering program that produces graduates who are adaptive to the workforce needs of business, industry, and entrepreneurship in Riau Province and the Sijori region by 2025.',
+                missionLabel: 'Mission',
+                mission1: 'Deliver mechanical engineering education that produces outstanding graduates who are adaptive to business, industry, and entrepreneurship needs with integrity based on science, technology, and faith.',
+                mission2: 'Conduct research to advance knowledge in engineering and solve problems in mechanical engineering.',
+                mission3: 'Provide community service as a form of applying engineering science and technology for public welfare.',
+                mission4: 'Provide adequate facilities and infrastructure to support a conducive learning process.',
+                mission5: 'Build cooperation with relevant institutions in and outside the country, especially in mechanical engineering.',
+                profileTitle: 'Graduate Profile',
+                profileIntro: 'Based on key factors influencing graduate profiles, the Mechanical Engineering Program at STT Pekanbaru defines the following graduate profiles:',
+                profileCol1: 'Profile',
+                profileCol2: 'Brief Description',
+                profileEngineer: 'Engineer',
+                profileEngineerDesc: 'Capable of meeting market needs for engineering roles.',
+                profileConsultant: 'Consultant',
+                profileConsultantDesc: 'Capable of meeting market needs for consulting services.',
+                profileEnergy: 'Energy Manager',
+                profileEnergyDesc: 'Capable of managing energy and materials.',
+                profileResearch: 'Research Assistant',
+                profileResearchDesc: 'Capable of meeting challenges in scientific development.',
+                profileEntrepreneur: 'Entrepreneur',
+                profileEntrepreneurDesc: 'Capable of creating new job opportunities.',
+                cplTitle: 'Graduate Learning Outcomes (CPL)',
+                cplIntro: 'The learning outcomes refer to graduate qualifications covering Attitude, General Knowledge, General Skills, and Special Skills.',
+                cplColCode: 'Code',
+                cplColAspect: 'Aspect',
+                cplColDesc: 'Graduate Learning Outcomes (CPL)',
+                cplAttitude: 'Attitude',
+                cplKnowledge: 'General Knowledge',
+                cplGeneralSkills: 'General Skills',
+                cplSpecialSkills: 'Special Skills',
+                cplS1: 'Devout in worship, faithful, and demonstrating moral integrity, professional responsibility, and national spirit in engineering practice.',
+                cplP1: 'Apply mathematics, basic sciences, and engineering principles to solve complex mechanical engineering problems.',
+                cplPU1: 'Communicate effectively, think critically, and collaborate across disciplines while upholding honesty and trustworthiness.',
+                cplPK1: 'Design AI-based mechanical systems for sustainable applications in oil & gas, palm oil, and pulp & paper industries.',
+                cplPK2: 'Use modern technologies (CAD/CAM/CAE, Python/AI) safely in engineering practice (K3).',
+                courseListTitle: 'Course List',
+                courseListIntro: 'Below is the complete course list for the Mechanical Engineering Program at STT Pekanbaru.',
+                courseListSearch: '🔍 Search by Course Name or Code...',
+                courseListTotal: 'Total Credit Load: <span id="grand-total-sks">0</span> Credits',
+                rpsTitle: 'Semester Learning Plan (RPS) Generator',
+                rpsIntro: 'This page helps lecturers prepare and print complete RPS documents.',
+                rplTitle: 'RPL Assessment (Recognition of Prior Learning)',
+                rplIntro: 'Main hub for assessment, credit transfer, and final reporting.',
+                rplRecognitionCourseLabel: 'Course',
+                rplRecognitionColNo: 'No',
+                rplRecognitionColSubCpmk: 'Sub-CPMK (Summary)',
+                rplRecognitionColWeight: 'Weight',
+                rplRecognitionColComment: 'Assessor Comments',
+                rplRecognitionColEvidence: 'Evidence',
+                rplRecognitionColStatus: 'Assessment Status',
+                rplRecognitionEvidencePlaceholder: 'Link/Document Name',
+                rplRecognitionStatusNone: 'Not Assessed',
+                rplRecognitionStatusExcellent: 'Achieved (Excellent)',
+                rplRecognitionStatusGood: 'Achieved (Good)',
+                rplRecognitionStatusSufficient: 'Sufficient',
+                rplRecognitionStatusEvidence: 'Need More Evidence',
+                rplRecognitionStatusNotAchieved: 'Not Achieved',
+                rplRecognitionSaveSingle: '💾 Save Assessment',
+                rplRecognitionEdit: '✏️ Edit Assessment',
+                rplRecognitionDelete: '🗑️ Delete',
+                printProgramTitle: 'Mechanical Engineering Study Program',
+                printAddress: 'Jl. Dirgantara No.4 Marpoyan Damai, Pekanbaru 28125 – Riau | Telp: 0761-61815 | www.sttp-yds.ac.id',
+                printConclusionTitle: 'Recognition of Prior Learning (RPL) Recapitulation Sheet',
+                printStudentName: 'Student Name',
+                printPriorEducation: 'Prior Education Level',
+                printCurrentJob: 'Current Job',
+                printBirthInfo: 'Place/Date of Birth',
+                printOriginId: 'Origin Student ID',
+                printWorkExperience: 'Work Experience Length',
+                printStudentId: 'Student ID',
+                printGraduationYear: 'Graduation Year',
+                conclusionColCode: 'Code',
+                conclusionColCourse: 'Course',
+                conclusionColCredits: 'Credits',
+                conclusionColStatus: 'Status',
+                conclusionColGrade: 'Grade',
+                conclusionColRemaining: 'Courses to Take',
+                semesterLabel: 'Semester',
+                statusNotTaken: 'Not Taken',
+                statusRecognizedTransfer: 'Recognized (Transfer)',
+                statusRecognizedRecognition: 'Recognized (Recognition)',
+                conclusionSummaryTitle: 'Final Summary',
+                conclusionSummaryCurriculum: 'Total Curriculum Credits',
+                conclusionSummaryTransfer: 'Total Transfer Credits',
+                conclusionSummaryRecognition: 'Total Recognition Credits',
+                conclusionSummaryRecognized: 'Total Recognized Credits',
+                conclusionSummaryRemaining: 'Remaining Credits Required',
+                conclusionApprovedBy: 'Approved by,',
+                conclusionDate: 'Date',
+                conclusionAssessor: 'RPL Assessor',
+                conclusionHead: 'Head of Mechanical Engineering Program\nSekolah Tinggi Teknologi Pekanbaru'
+            }
+        };
+    </script>
+</body>
+</html>
